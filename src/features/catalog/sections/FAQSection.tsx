@@ -1,4 +1,5 @@
-import { SectionHeader } from '@/components/common/SectionHeader'
+import { useState } from 'react'
+import { FaqAccordionItem } from '@/features/catalog/components/FaqAccordionItem'
 import type { FaqItem } from '@/features/catalog/types/catalog.types'
 
 interface FAQSectionProps {
@@ -6,22 +7,24 @@ interface FAQSectionProps {
 }
 
 export function FAQSection({ items }: FAQSectionProps) {
-  return (
-    <section id="faq" className="page-shell section-spacing">
-      <SectionHeader
-        eyebrow="FAQ"
-        title="Respostas para as duvidas que mais impactam a decisao de compra."
-      />
+  const [open, setOpen] = useState<number | null>(0)
 
-      <div className="mt-8 space-y-4">
-        {items.map((item) => (
-          <details key={item.id} className="surface-card p-6">
-            <summary className="cursor-pointer list-none font-semibold text-brand-950">
-              {item.question}
-            </summary>
-            <p className="mt-4 text-brand-700">{item.answer}</p>
-          </details>
-        ))}
+  return (
+    <section id="faq" className="bg-forest-900 py-24 text-white">
+      <div className="page-shell max-w-3xl">
+        <h2 className="mb-12 text-center font-display text-4xl font-bold">
+          Duvidas comuns
+        </h2>
+        <div className="space-y-4">
+          {items.map((item, index) => (
+            <FaqAccordionItem
+              key={item.id}
+              isOpen={open === index}
+              item={item}
+              onToggle={() => setOpen(open === index ? null : index)}
+            />
+          ))}
+        </div>
       </div>
     </section>
   )

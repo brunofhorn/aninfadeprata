@@ -5,6 +5,13 @@ export interface SocialLink {
   url: string
 }
 
+export interface ChapterPreview {
+  id: string
+  title: string
+  description: string
+  icon: 'sparkles' | 'eye' | 'music'
+}
+
 export interface Author {
   id: string
   name: string
@@ -19,12 +26,16 @@ export interface Character {
   name: string
   role: string
   description: string
+  imageUrl?: string
+  gridSpan?: string
 }
 
 export interface Location {
   id: string
   name: string
   description: string
+  imageUrl?: string
+  gridSpan?: string
 }
 
 export interface Testimonial {
@@ -70,6 +81,7 @@ export interface Book {
   author: Author
   characters: Character[]
   locations: Location[]
+  chapters: ChapterPreview[]
   testimonials: Testimonial[]
   faqs: FaqItem[]
   variants: ProductVariant[]

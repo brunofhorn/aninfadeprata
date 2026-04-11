@@ -1,4 +1,4 @@
-import { SectionHeader } from '@/components/common/SectionHeader'
+import { WorldCard } from '@/features/catalog/components/WorldCard'
 import type { Character, Location } from '@/features/catalog/types/catalog.types'
 
 interface WorldSectionProps {
@@ -7,37 +7,17 @@ interface WorldSectionProps {
 }
 
 export function WorldSection({ characters, locations }: WorldSectionProps) {
-  return (
-    <section className="page-shell section-spacing grid gap-12 lg:grid-cols-2">
-      <div>
-        <SectionHeader
-          eyebrow="Personagens"
-          title="Presencas que conduzem a tensao, o afeto e o misterio."
-        />
-        <div className="mt-6 space-y-4">
-          {characters.map((character) => (
-            <article key={character.id} className="surface-card p-6">
-              <p className="text-xs font-bold uppercase tracking-[0.24em] text-brand-500">
-                {character.role}
-              </p>
-              <h3 className="mt-2 text-2xl">{character.name}</h3>
-              <p className="mt-3 text-brand-700">{character.description}</p>
-            </article>
-          ))}
-        </div>
-      </div>
+  const showcase = [...characters, ...locations].slice(0, 6)
 
-      <div>
-        <SectionHeader
-          eyebrow="Locais"
-          title="Cenarios com identidade visual forte para sustentar a comunicacao comercial."
-        />
-        <div className="mt-6 space-y-4">
-          {locations.map((location) => (
-            <article key={location.id} className="surface-card p-6">
-              <h3 className="text-2xl">{location.name}</h3>
-              <p className="mt-3 text-brand-700">{location.description}</p>
-            </article>
+  return (
+    <section id="mundo" className="bg-forest-900 py-24 text-white">
+      <div className="page-shell">
+        <h2 className="mb-12 text-center font-display text-4xl font-bold">
+          Habitantes e cenarios do bosque
+        </h2>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+          {showcase.map((item, index) => (
+            <WorldCard key={item.id} entity={item} index={index} />
           ))}
         </div>
       </div>

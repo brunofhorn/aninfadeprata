@@ -17,6 +17,21 @@
   --color-brand-950: #170d0c;
   --color-accent-500: #3b7f6e;
   --color-accent-600: #2f6658;
+  --color-forest-500: #1d312d;
+  --color-forest-600: #172723;
+  --color-forest-700: #12211d;
+  --color-forest-800: #0d1714;
+  --color-forest-900: #09110f;
+  --color-forest-950: #040807;
+  --color-nymph-300: #9de8bf;
+  --color-nymph-400: #7cc79d;
+  --color-nymph-500: #57a87e;
+  --color-mystic-400: #c8a6ff;
+  --color-mystic-500: #a777f2;
+  --color-mystic-700: #50336e;
+  --color-silver-200: #ebe6ef;
+  --color-silver-300: #d8d1df;
+  --color-silver-400: #bfb4c9;
   --shadow-soft: 0 20px 60px rgba(23, 13, 12, 0.08);
 }
 
@@ -79,5 +94,16 @@
 
   .section-spacing {
     @apply py-16 sm:py-20 lg:py-24;
+  }
+
+  .glass-card {
+    @apply border border-white/10 bg-white/5 backdrop-blur-xl;
+  }
+
+  .silver-glow {
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 24px 80px rgba(167, 119, 242, 0.16),
+      0 0 42px rgba(191, 180, 201, 0.18);
   }
 }

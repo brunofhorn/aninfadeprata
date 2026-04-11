@@ -1,5 +1,4 @@
-import { SectionHeader } from '@/components/common/SectionHeader'
-import { ProductOptionCard } from '@/features/catalog/components/ProductOptionCard'
+import { PricingCard } from '@/features/catalog/components/PricingCard'
 import type { ProductVariant } from '@/features/catalog/types/catalog.types'
 
 interface PurchaseOptionsSectionProps {
@@ -12,17 +11,22 @@ export function PurchaseOptionsSection({
   onSelect,
 }: PurchaseOptionsSectionProps) {
   return (
-    <section id="edicoes" className="page-shell section-spacing">
-      <SectionHeader
-        eyebrow="Formatos de compra"
-        title="Escolha a experiencia de leitura que faz mais sentido agora."
-        description="A arquitetura de checkout ja nasce preparada para itens digitais, livros fisicos, autografos e kits especiais."
-        align="center"
-      />
-      <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {products.map((product) => (
-          <ProductOptionCard key={product.id} product={product} onSelect={onSelect} />
-        ))}
+    <section id="comprar" className="relative overflow-hidden bg-forest-900 py-24 text-white">
+      <div className="page-shell max-w-6xl">
+        <h2 className="mb-16 text-center font-display text-4xl font-bold">
+          Traga a magia para casa
+        </h2>
+
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+          {products.map((product, index) => (
+            <PricingCard
+              key={product.id}
+              featured={index === 2 || index === products.length - 1}
+              product={product}
+              onSelect={onSelect}
+            />
+          ))}
+        </div>
       </div>
     </section>
   )

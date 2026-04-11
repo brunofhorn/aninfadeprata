@@ -4,6 +4,8 @@ import { Seo } from '@/components/common/Seo'
 import { ROUTES } from '@/constants/routes'
 import { AuthorSection } from '@/features/author/sections/AuthorSection'
 import { useBook } from '@/features/catalog/hooks/useBook'
+import { ChaptersSection } from '@/features/catalog/sections/ChaptersSection'
+import { ContactSection } from '@/features/catalog/sections/ContactSection'
 import { FAQSection } from '@/features/catalog/sections/FAQSection'
 import { HeroSection } from '@/features/catalog/sections/HeroSection'
 import { PurchaseOptionsSection } from '@/features/catalog/sections/PurchaseOptionsSection'
@@ -11,7 +13,6 @@ import { SynopsisSection } from '@/features/catalog/sections/SynopsisSection'
 import { WorldSection } from '@/features/catalog/sections/WorldSection'
 import type { ProductVariant } from '@/features/catalog/types/catalog.types'
 import { useCheckout } from '@/features/checkout/hooks/useCheckout'
-import { TestimonialsSection } from '@/features/testimonials/sections/TestimonialsSection'
 
 export function HomePage() {
   const navigate = useNavigate()
@@ -33,13 +34,16 @@ export function HomePage() {
         title={`${book.title} | Landing page oficial`}
         description={book.description}
       />
-      <HeroSection book={book} />
-      <SynopsisSection book={book} />
-      <AuthorSection author={book.author} />
-      <WorldSection characters={book.characters} locations={book.locations} />
-      <TestimonialsSection testimonials={book.testimonials} />
-      <PurchaseOptionsSection products={book.variants} onSelect={handleSelectProduct} />
-      <FAQSection items={book.faqs} />
+      <div className="bg-forest-950 text-white">
+        <HeroSection book={book} />
+        <SynopsisSection book={book} />
+        <WorldSection characters={book.characters} locations={book.locations} />
+        <ChaptersSection chapters={book.chapters} />
+        <PurchaseOptionsSection products={book.variants} onSelect={handleSelectProduct} />
+        <AuthorSection author={book.author} />
+        <FAQSection items={book.faqs} />
+        <ContactSection />
+      </div>
     </>
   )
 }
