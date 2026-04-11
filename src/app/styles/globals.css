@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Manrope', sans-serif;
+  --font-display: 'Fraunces', serif;
+  --color-brand-50: #f7f6f1;
+  --color-brand-100: #efe8d8;
+  --color-brand-200: #dfcfb0;
+  --color-brand-300: #cfb686;
+  --color-brand-400: #bb8c53;
+  --color-brand-500: #99663f;
+  --color-brand-600: #7d4f35;
+  --color-brand-700: #623f2f;
+  --color-brand-800: #412921;
+  --color-brand-900: #2a1815;
+  --color-brand-950: #170d0c;
+  --color-accent-500: #3b7f6e;
+  --color-accent-600: #2f6658;
+  --shadow-soft: 0 20px 60px rgba(23, 13, 12, 0.08);
+}
+
+@layer base {
+  * {
+    @apply border-brand-100;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-brand-50 font-sans text-brand-800 antialiased;
+    background-image:
+      radial-gradient(circle at top, rgba(223, 207, 176, 0.42), transparent 36%),
+      linear-gradient(180deg, #f7f6f1 0%, #f9f4ea 100%);
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display text-brand-950;
+  }
+
+  p {
+    @apply leading-7;
+  }
+
+  a,
+  button,
+  input,
+  select,
+  textarea {
+    @apply transition-all duration-200;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    @apply outline-none ring-2 ring-brand-400 ring-offset-2 ring-offset-brand-50;
+  }
+}
+
+@layer utilities {
+  .page-shell {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .surface-card {
+    @apply rounded-[28px] border border-white/70 bg-white/85 shadow-soft backdrop-blur;
+  }
+
+  .section-spacing {
+    @apply py-16 sm:py-20 lg:py-24;
+  }
+}

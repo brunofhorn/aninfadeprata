@@ -1,0 +1,166 @@
+import type { Book } from '@/features/catalog/types/catalog.types'
+import { PRODUCT_TYPES } from '@/types/enums'
+
+export const bookMock: Book = {
+  id: 'book-001',
+  slug: 'a-ninfa-de-prata',
+  title: 'A Ninfa de Prata',
+  subtitle: 'Entre memorias, mar e destino',
+  tagline: 'Uma fantasia sensivel para quem procura beleza, misterio e coragem.',
+  description:
+    'Um romance de fantasia lirica que costura segredos familiares, viagens interiores e um mundo que parece sussurrar para quem ainda sabe escutar.',
+  synopsis:
+    'Quando ecos de um passado esquecido voltam a emergir, uma jovem autora de mapas emocionais se ve obrigada a atravessar a costa prateada onde lendas nunca morreram. Entre escolhas afetivas, promessas antigas e um chamado quase impossivel de ignorar, ela descobre que alguns livros nao contam apenas uma historia: eles abrem portais para aquilo que ainda precisamos nos tornar.',
+  pitch:
+    'Uma landing page pensada para converter curiosidade em compra, destacando a atmosfera do livro, a voz da autora e as diferentes experiencias de aquisicao para leitoras e leitores que desejam colecionar mais do que uma leitura.',
+  isbn: '978-65-00000-01-1',
+  pageCount: 312,
+  language: 'Portugues',
+  publicationYear: 2026,
+  categories: ['Fantasia', 'Romance', 'Drama'],
+  author: {
+    id: 'author-001',
+    name: 'Helena Maris',
+    headline: 'Autora de fantasia contemporanea e narrativas de atmosfera poetica.',
+    bio: 'Helena Maris escreve historias centradas em memoria, identidade e paisagens afetivas. Seus livros investigam o encontro entre o fantastico e o intimo, sempre com foco em personagens que precisam atravessar transformacoes profundas.',
+    socialLinks: [
+      { label: 'Instagram', url: 'https://instagram.com/' },
+      { label: 'Site oficial', url: 'https://example.com/' },
+    ],
+  },
+  characters: [
+    {
+      id: 'char-1',
+      name: 'Lina',
+      role: 'Protagonista',
+      description: 'Cartografa emocional que aprende a ler silencios como mapas.',
+    },
+    {
+      id: 'char-2',
+      name: 'Ari',
+      role: 'Guardiao das mareas',
+      description: 'Um aliado enigmatico que conhece os ritos e os perigos da costa.',
+    },
+    {
+      id: 'char-3',
+      name: 'Mara',
+      role: 'Voz do passado',
+      description: 'Figura central na heranca afetiva e espiritual que move a trama.',
+    },
+  ],
+  locations: [
+    {
+      id: 'loc-1',
+      name: 'Costa de Vidro',
+      description: 'Falésias, agua fria e um horizonte que parece guardar pressagios.',
+    },
+    {
+      id: 'loc-2',
+      name: 'Casa das Mareas',
+      description: 'Uma residencia ancestral onde o tempo dobra sobre si.',
+    },
+    {
+      id: 'loc-3',
+      name: 'Biblioteca Submersa',
+      description: 'Espaco simbolico onde lembrancas e escolhas voltam a respirar.',
+    },
+  ],
+  testimonials: [
+    {
+      id: 'test-1',
+      authorName: 'Leitora beta',
+      text: 'Uma fantasia delicada e poderosa, com cenas que ficam ecoando por dias.',
+      highlight: 'Delicada e poderosa',
+    },
+    {
+      id: 'test-2',
+      authorName: 'Clube de leitura Aurora',
+      text: 'O livro mistura lirismo e tensao de um jeito raro. E impossivel sair igual da leitura.',
+      highlight: 'Impossivel sair igual',
+    },
+    {
+      id: 'test-3',
+      authorName: 'Editora convidada',
+      text: 'Um projeto com enorme potencial comercial e emocional, especialmente em edicoes especiais.',
+      highlight: 'Potencial comercial e emocional',
+    },
+  ],
+  faqs: [
+    {
+      id: 'faq-1',
+      question: 'Qual a diferenca entre EPUB e PDF?',
+      answer:
+        'O EPUB se adapta melhor ao tamanho da tela e costuma ser ideal para e-readers. O PDF preserva o layout original da edicao.',
+    },
+    {
+      id: 'faq-2',
+      question: 'Como funciona a versao com autografo?',
+      answer:
+        'No checkout, a pessoa compradora pode informar uma dedicatoria curta. O pedido segue para a autora apenas apos confirmacao do pagamento.',
+    },
+    {
+      id: 'faq-3',
+      question: 'O Pix confirma na hora?',
+      answer:
+        'Na maioria dos casos sim. O frontend acompanha o status por polling e redireciona automaticamente quando o backend confirma o pagamento.',
+    },
+  ],
+  variants: [
+    {
+      id: 'variant-epub',
+      type: PRODUCT_TYPES.EPUB,
+      name: 'Digital EPUB',
+      description: 'Arquivo flexivel para Kindle, Kobo e leitores compativeis.',
+      price: 29.9,
+      compareAtPrice: 39.9,
+      shippingRequired: false,
+      autographAvailable: false,
+      deliveryEstimate: 'Entrega imediata por email',
+    },
+    {
+      id: 'variant-pdf',
+      type: PRODUCT_TYPES.PDF,
+      name: 'Digital PDF',
+      description: 'Layout original preservado para leitura em tablet ou computador.',
+      price: 24.9,
+      compareAtPrice: 34.9,
+      shippingRequired: false,
+      autographAvailable: false,
+      deliveryEstimate: 'Entrega imediata por email',
+    },
+    {
+      id: 'variant-physical',
+      type: PRODUCT_TYPES.PHYSICAL,
+      name: 'Fisico',
+      description: 'Edicao impressa com acabamento premium e marcador.',
+      price: 59.9,
+      compareAtPrice: 69.9,
+      shippingRequired: true,
+      autographAvailable: false,
+      deliveryEstimate: 'Postagem em ate 4 dias uteis',
+    },
+    {
+      id: 'variant-signed',
+      type: PRODUCT_TYPES.PHYSICAL_SIGNED,
+      name: 'Fisico com autografo',
+      description: 'Edicao assinada pela autora com dedicacao opcional.',
+      price: 79.9,
+      compareAtPrice: 89.9,
+      shippingRequired: true,
+      autographAvailable: true,
+      deliveryEstimate: 'Postagem em ate 6 dias uteis',
+    },
+    {
+      id: 'variant-signed-gift',
+      type: PRODUCT_TYPES.PHYSICAL_SIGNED_GIFT,
+      name: 'Fisico com autografo e brindes',
+      description: 'Livro autografado com marcador especial, card e envelope tematico.',
+      price: 99.9,
+      compareAtPrice: 119.9,
+      shippingRequired: true,
+      autographAvailable: true,
+      giftsIncluded: ['Marcador metalizado', 'Card colecionavel', 'Envelope tematico'],
+      deliveryEstimate: 'Postagem em ate 7 dias uteis',
+    },
+  ],
+}
