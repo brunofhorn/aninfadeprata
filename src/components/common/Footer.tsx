@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { FiBook, FiGlobe, FiInstagram, FiMail } from 'react-icons/fi'
+import { FiBook, FiInstagram, FiMail } from 'react-icons/fi'
 import { BrandWordmark } from '@/components/common/BrandWordmark'
 import { ROUTES } from '@/constants/routes'
 import { IoLogoTiktok } from 'react-icons/io5'
