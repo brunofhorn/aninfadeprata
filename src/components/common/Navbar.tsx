@@ -6,6 +6,7 @@ import {
   FiShoppingBag,
   FiX,
 } from 'react-icons/fi'
+import { BrandWordmark } from '@/components/common/BrandWordmark'
 import { ROUTES } from '@/constants/routes'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/utils/cn'
@@ -36,7 +37,7 @@ export function Navbar({ minimal = false }: NavbarProps) {
               <FiBookOpen />
             </div>
             <div>
-              <p className="font-display text-lg leading-none">A Ninfa de Prata</p>
+              <BrandWordmark className="text-lg leading-none" />
               <p className="text-xs uppercase tracking-[0.24em] text-brand-500">Livro oficial</p>
             </div>
           </Link>
@@ -67,9 +68,7 @@ export function Navbar({ minimal = false }: NavbarProps) {
             </button>
 
             <Link to={ROUTES.home}>
-              <h1 className="font-display text-2xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(192,192,192,0.4)]">
-                A Ninfa de Prata
-              </h1>
+              <BrandWordmark className="text-2xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(192,192,192,0.4)]" />
             </Link>
           </div>
 
@@ -118,7 +117,7 @@ export function Navbar({ minimal = false }: NavbarProps) {
             <FiBookOpen />
           </div>
           <div>
-            <p className="font-display text-lg leading-none">A Ninfa de Prata</p>
+            <BrandWordmark className="text-lg leading-none" />
             <p className="text-xs uppercase tracking-[0.24em] text-brand-500">Livro oficial</p>
           </div>
         </Link>

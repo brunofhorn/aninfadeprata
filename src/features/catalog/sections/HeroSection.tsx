@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { FiArrowRight, FiStar } from 'react-icons/fi'
 import { IoLeafOutline } from 'react-icons/io5'
 import { LuSparkles } from 'react-icons/lu'
+import { BrandWordmark } from '@/components/common/BrandWordmark'
 import { ROUTES } from '@/constants/routes'
 import { Button } from '@/components/ui/Button'
 import type { Book } from '@/features/catalog/types/catalog.types'
@@ -38,7 +39,9 @@ export function HeroSection({ book }: HeroSectionProps) {
           </span>
 
           <div>
-            <p className="mb-4 font-display text-xl italic text-nymph-300/80">{book.title}</p>
+            <p className="mb-4 italic text-nymph-300/80">
+              <BrandWordmark className="text-xl" name={book.title} />
+            </p>
             <h2 className="font-display text-5xl font-bold leading-tight text-white md:text-7xl">
               Onde a <span className="text-silver-200 drop-shadow-[0_0_10px_rgba(198,198,198,0.5)]">prata</span>{' '}
               encontra a magia

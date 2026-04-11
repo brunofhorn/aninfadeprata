@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { BrandWordmark } from '@/components/common/BrandWordmark'
 import { ErrorState } from '@/components/common/ErrorState'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { Seo } from '@/components/common/Seo'
@@ -43,7 +44,9 @@ export function BookDetailsPage() {
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-brand-500">
             Detalhes do livro
           </p>
-          <h1 className="mt-3 text-5xl leading-tight">{book.title}</h1>
+          <h1 className="mt-3 text-5xl leading-tight">
+            <BrandWordmark className="text-5xl" name={book.title} />
+          </h1>
           <p className="mt-4 text-xl text-brand-600">{book.subtitle}</p>
           <p className="mt-6 text-brand-700">{book.pitch}</p>
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
