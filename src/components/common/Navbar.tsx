@@ -13,6 +13,7 @@ import { cn } from '@/utils/cn'
 
 interface NavbarProps {
   minimal?: boolean
+  minimalTheme?: 'light' | 'dark'
 }
 
 const landingLinks = [
@@ -23,27 +24,65 @@ const landingLinks = [
   { href: '#comprar', label: 'Comprar' },
 ] as const
 
-export function Navbar({ minimal = false }: NavbarProps) {
+export function Navbar({
+  minimal = false,
+  minimalTheme = 'light',
+}: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const { pathname } = useLocation()
   const isHome = pathname === ROUTES.home
 
   if (minimal) {
+    const isDarkMinimal = minimalTheme === 'dark'
+
     return (
-      <header className="sticky top-0 z-40 border-b border-white/70 bg-brand-50/90 backdrop-blur">
+      <header
+        className={cn(
+          'sticky top-0 z-40 border-b backdrop-blur-xl',
+          isDarkMinimal
+            ? 'border-white/8 bg-forest-950/80'
+            : 'border-white/70 bg-brand-50/90',
+        )}
+      >
         <div className="page-shell flex items-center justify-between py-4">
-          <Link className="flex items-center gap-3 text-brand-950" to={ROUTES.home}>
-            <div className="flex size-11 items-center justify-center rounded-full bg-brand-900 text-brand-50">
+          <Link
+            className={cn(
+              'flex items-center gap-3',
+              isDarkMinimal ? 'text-white' : 'text-brand-950',
+            )}
+            to={ROUTES.home}
+          >
+            <div
+              className={cn(
+                'flex size-11 items-center justify-center rounded-full',
+                isDarkMinimal
+                  ? 'border border-nymph-400/30 bg-white/8 text-nymph-300'
+                  : 'bg-brand-900 text-brand-50',
+              )}
+            >
               <FiBookOpen />
             </div>
             <div>
               <BrandWordmark className="text-lg leading-none" />
-              <p className="text-xs uppercase tracking-[0.24em] text-brand-500">Livro oficial</p>
+              <p
+                className={cn(
+                  'text-xs uppercase tracking-[0.24em]',
+                  isDarkMinimal ? 'text-white/45' : 'text-brand-500',
+                )}
+              >
+                Livro oficial
+              </p>
             </div>
           </Link>
 
           <Link to={ROUTES.checkout}>
-            <Button variant="secondary">
+            <Button
+              className={cn(
+                isDarkMinimal &&
+                  'border border-nymph-400/30 bg-white/6 text-nymph-300 hover:bg-nymph-400/12',
+              )}
+              variant={isDarkMinimal ? 'ghost' : 'secondary'}
+            >
               <FiShoppingBag />
               Checkout
             </Button>

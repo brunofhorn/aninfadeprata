@@ -15,54 +15,69 @@ export function CreditCardFields({
   errors,
 }: CreditCardFieldsProps) {
   return (
-    <div className="mt-4 grid gap-4 sm:grid-cols-2">
-      <Input
-        id="holderName"
-        label="Nome do titular"
-        error={errors.card?.holderName?.message}
-        placeholder="Nome impresso no cartao"
-        {...register('card.holderName')}
-      />
-      <Input
-        id="holderCpf"
-        label="CPF do titular"
-        error={errors.card?.holderCpf?.message}
-        placeholder="000.000.000-00"
-        {...register('card.holderCpf', {
-          onChange: (event) => setValue('card.holderCpf', formatCpf(event.target.value)),
-        })}
-      />
-      <Input
-        id="cardNumber"
-        label="Numero do cartao"
-        error={errors.card?.cardNumber?.message}
-        placeholder="0000 0000 0000 0000"
-        {...register('card.cardNumber')}
-      />
-      <Input
-        id="expiry"
-        label="Validade"
-        error={errors.card?.expiry?.message}
-        placeholder="12/29"
-        {...register('card.expiry')}
-      />
-      <Input
-        id="cvv"
-        label="CVV"
-        error={errors.card?.cvv?.message}
-        placeholder="123"
-        {...register('card.cvv')}
-      />
-      <Input
-        id="installments"
-        label="Parcelas"
-        error={errors.card?.installments?.message}
-        max={6}
-        min={1}
-        placeholder="1"
-        type="number"
-        {...register('card.installments', { valueAsNumber: true })}
-      />
+    <div className="mt-5 rounded-[24px] border border-white/8 bg-white/[0.03] p-5 sm:p-6">
+      <div className="mb-4 space-y-2">
+        <p className="text-xs font-bold uppercase tracking-[0.28em] text-silver-300/75">
+          PagBank
+        </p>
+        <h3 className="text-2xl text-white">Dados do cartao</h3>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Input
+          id="holderName"
+          label="Nome do titular"
+          error={errors.card?.holderName?.message}
+          placeholder="Nome impresso no cartao"
+          tone="dark"
+          {...register('card.holderName')}
+        />
+        <Input
+          id="holderCpf"
+          label="CPF do titular"
+          error={errors.card?.holderCpf?.message}
+          placeholder="000.000.000-00"
+          tone="dark"
+          {...register('card.holderCpf', {
+            onChange: (event) => setValue('card.holderCpf', formatCpf(event.target.value)),
+          })}
+        />
+        <Input
+          id="cardNumber"
+          label="Numero do cartao"
+          error={errors.card?.cardNumber?.message}
+          placeholder="0000 0000 0000 0000"
+          tone="dark"
+          {...register('card.cardNumber')}
+        />
+        <Input
+          id="expiry"
+          label="Validade"
+          error={errors.card?.expiry?.message}
+          placeholder="12/29"
+          tone="dark"
+          {...register('card.expiry')}
+        />
+        <Input
+          id="cvv"
+          label="CVV"
+          error={errors.card?.cvv?.message}
+          placeholder="123"
+          tone="dark"
+          {...register('card.cvv')}
+        />
+        <Input
+          id="installments"
+          label="Parcelas"
+          error={errors.card?.installments?.message}
+          max={6}
+          min={1}
+          placeholder="1"
+          tone="dark"
+          type="number"
+          {...register('card.installments', { valueAsNumber: true })}
+        />
+      </div>
     </div>
   )
 }

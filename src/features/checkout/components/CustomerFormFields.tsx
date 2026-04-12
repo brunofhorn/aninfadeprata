@@ -21,14 +21,20 @@ export function CustomerFormFields({
 }: CustomerFormFieldsProps) {
   return (
     <div className="space-y-8">
-      <section className="space-y-4">
-        <h2 className="text-2xl">Dados da compra</h2>
+      <section className="space-y-4 rounded-[24px] border border-white/8 bg-white/[0.03] p-5 sm:p-6">
+        <div className="space-y-2">
+          <p className="text-xs font-bold uppercase tracking-[0.28em] text-nymph-300/75">
+            Comprador
+          </p>
+          <h2 className="text-2xl text-white">Dados da compra</h2>
+        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Input
             id="fullName"
             label="Nome completo"
             error={errors.customer?.fullName?.message}
             placeholder="Seu nome"
+            tone="dark"
             {...register('customer.fullName')}
           />
           <Input
@@ -36,6 +42,7 @@ export function CustomerFormFields({
             label="Email"
             error={errors.customer?.email?.message}
             placeholder="voce@email.com"
+            tone="dark"
             {...register('customer.email')}
           />
           <Input
@@ -43,6 +50,7 @@ export function CustomerFormFields({
             label="Telefone"
             error={errors.customer?.phone?.message}
             placeholder="(11) 99999-9999"
+            tone="dark"
             {...register('customer.phone', {
               onChange: (event) => setValue('customer.phone', formatPhone(event.target.value)),
             })}
@@ -52,6 +60,7 @@ export function CustomerFormFields({
             label="CPF"
             error={errors.customer?.cpf?.message}
             placeholder="000.000.000-00"
+            tone="dark"
             {...register('customer.cpf', {
               onChange: (event) => setValue('customer.cpf', formatCpf(event.target.value)),
             })}
@@ -60,14 +69,20 @@ export function CustomerFormFields({
       </section>
 
       {showShippingAddress ? (
-        <section className="space-y-4">
-          <h2 className="text-2xl">Endereco de entrega</h2>
+        <section className="space-y-4 rounded-[24px] border border-white/8 bg-white/[0.03] p-5 sm:p-6">
+          <div className="space-y-2">
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-silver-300/75">
+              Logistica
+            </p>
+            <h2 className="text-2xl text-white">Endereco de entrega</h2>
+          </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <Input
               id="zipCode"
               label="CEP"
               error={errors.shippingAddress?.zipCode?.message}
               placeholder="00000-000"
+              tone="dark"
               {...register('shippingAddress.zipCode', {
                 onChange: (event) =>
                   setValue('shippingAddress.zipCode', formatZipCode(event.target.value)),
@@ -78,6 +93,7 @@ export function CustomerFormFields({
               label="Rua"
               error={errors.shippingAddress?.street?.message}
               placeholder="Rua das Mareas"
+              tone="dark"
               {...register('shippingAddress.street')}
             />
             <Input
@@ -85,6 +101,7 @@ export function CustomerFormFields({
               label="Numero"
               error={errors.shippingAddress?.number?.message}
               placeholder="123"
+              tone="dark"
               {...register('shippingAddress.number')}
             />
             <Input
@@ -92,6 +109,7 @@ export function CustomerFormFields({
               label="Complemento"
               error={errors.shippingAddress?.complement?.message}
               placeholder="Apto, bloco, referencia"
+              tone="dark"
               {...register('shippingAddress.complement')}
             />
             <Input
@@ -99,6 +117,7 @@ export function CustomerFormFields({
               label="Bairro"
               error={errors.shippingAddress?.neighborhood?.message}
               placeholder="Centro"
+              tone="dark"
               {...register('shippingAddress.neighborhood')}
             />
             <Input
@@ -106,6 +125,7 @@ export function CustomerFormFields({
               label="Cidade"
               error={errors.shippingAddress?.city?.message}
               placeholder="Sao Paulo"
+              tone="dark"
               {...register('shippingAddress.city')}
             />
             <Input
@@ -115,6 +135,7 @@ export function CustomerFormFields({
               error={errors.shippingAddress?.state?.message}
               maxLength={2}
               placeholder="SP"
+              tone="dark"
               {...register('shippingAddress.state')}
             />
           </div>
@@ -122,14 +143,20 @@ export function CustomerFormFields({
       ) : null}
 
       {showAutographField ? (
-        <section className="space-y-4">
-          <h2 className="text-2xl">Dedicacao opcional</h2>
+        <section className="space-y-4 rounded-[24px] border border-white/8 bg-white/[0.03] p-5 sm:p-6">
+          <div className="space-y-2">
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-mystic-400/75">
+              Autografo
+            </p>
+            <h2 className="text-2xl text-white">Dedicacao opcional</h2>
+          </div>
           <Textarea
             id="autographMessage"
             label="Mensagem para o autografo"
             error={errors.autographMessage?.message}
             maxLength={140}
             placeholder="Para quem a autora deve dedicar o exemplar?"
+            tone="dark"
             {...register('autographMessage')}
           />
         </section>

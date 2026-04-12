@@ -12,7 +12,7 @@ interface CheckoutState {
   paymentMethod: PaymentMethod | null
   paymentStatus: PaymentStatus | null
   pixPayment: PixPaymentResponse | null
-  setSelectedProduct: (product: ProductVariant) => void
+  setSelectedProduct: (product: ProductVariant | null) => void
   setCheckoutData: (data: Partial<CheckoutFormData>) => void
   setOrder: (order: Order) => void
   setPaymentMethod: (method: PaymentMethod) => void
