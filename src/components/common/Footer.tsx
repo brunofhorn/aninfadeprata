@@ -1,11 +1,14 @@
-import { Link, useLocation } from 'react-router-dom'
+'use client'
+
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { FiBook, FiInstagram, FiMail } from 'react-icons/fi'
 import { BrandWordmark } from '@/components/common/BrandWordmark'
 import { ROUTES } from '@/constants/routes'
 import { IoLogoTiktok } from 'react-icons/io5'
 
 export function Footer() {
-  const { pathname } = useLocation()
+  const pathname = usePathname()
   const isHome = pathname === ROUTES.home
 
   if (isHome) {
@@ -66,8 +69,8 @@ export function Footer() {
         </div>
 
         <div className="flex gap-4">
-          <Link to={ROUTES.privacy}>Privacidade</Link>
-          <Link to={ROUTES.terms}>Termos</Link>
+          <Link href={ROUTES.privacy}>Privacidade</Link>
+          <Link href={ROUTES.terms}>Termos</Link>
         </div>
       </div>
     </footer>

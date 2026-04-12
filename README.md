@@ -4,9 +4,8 @@ Landing page comercial com checkout funcional para venda de livro em formatos di
 
 ## Stack
 
-- React + TypeScript + Vite
+- Next.js + React + TypeScript
 - TailwindCSS
-- React Router DOM
 - Axios
 - React Hook Form + Zod
 - TanStack Query
@@ -26,16 +25,17 @@ npm run dev
 
 - `npm run dev`: ambiente local
 - `npm run build`: build de producao
+- `npm run start`: sobe a build de producao
 - `npm run lint`: lint
 - `npm run typecheck`: validacao TypeScript
 
 ## Estrutura
 
 ```txt
+app/
 src/
   app/
     providers/
-    router/
     styles/
   components/
     common/
@@ -50,7 +50,7 @@ src/
   integrations/
     api/
   layouts/
-  pages/
+  views/
   types/
   utils/
   mocks/
@@ -81,13 +81,14 @@ Esta base simula o backend com mocks em `sessionStorage` para acelerar a impleme
 Em producao:
 
 - o frontend nao deve conter segredo do PagBank
+- para checkout transparente com cartao, o frontend deve usar apenas a chave publica do PagBank e enviar o cartao criptografado para o backend
 - a tokenizacao do cartao deve ocorrer com SDK seguro ou campos do provedor
 - o backend deve criar cobrancas, receber webhooks e persistir status oficiais
 - o frontend deve falar apenas com a API intermediaria da aplicacao
 
 ## Proximos passos recomendados
 
-- ligar `catalogService`, `checkoutService` e `paymentService` a uma API real
+- ligar `catalogService`, `checkoutService` e `paymentService` a uma API real ou Route Handlers do Next
 - adicionar cupons, frete e calculo logistico
 - criar area do cliente e rastreio de pedidos
 - preparar admin para conteudo, estoque e campanhas

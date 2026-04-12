@@ -20,3 +20,18 @@ export function formatPhone(value: string) {
 export function formatZipCode(value: string) {
   return onlyDigits(value).slice(0, 8).replace(/(\d{5})(\d{1,3})$/, '$1-$2')
 }
+
+export function formatCardNumber(value: string) {
+  return onlyDigits(value)
+    .slice(0, 16)
+    .replace(/(\d{4})(?=\d)/g, '$1 ')
+    .trim()
+}
+
+export function formatCardExpiry(value: string) {
+  return onlyDigits(value).slice(0, 4).replace(/(\d{2})(\d{1,2})$/, '$1/$2')
+}
+
+export function formatSecurityCode(value: string) {
+  return onlyDigits(value).slice(0, 4)
+}

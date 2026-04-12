@@ -1,8 +1,10 @@
-import { Outlet } from 'react-router-dom'
+'use client'
+
+import type { PropsWithChildren } from 'react'
 import { Navbar } from '@/components/common/Navbar'
 import { useScrollToTop } from '@/hooks/useScrollToTop'
 
-export function CheckoutLayout() {
+export function CheckoutLayout({ children }: PropsWithChildren) {
   useScrollToTop()
 
   return (
@@ -15,7 +17,7 @@ export function CheckoutLayout() {
 
       <Navbar minimal minimalTheme="dark" />
       <main className="page-shell relative z-10 py-10 sm:py-14">
-        <Outlet />
+        {children}
       </main>
     </div>
   )

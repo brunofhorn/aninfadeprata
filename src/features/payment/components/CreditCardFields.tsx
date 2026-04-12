@@ -1,7 +1,7 @@
 import type { FieldErrors, UseFormRegister, UseFormSetValue } from 'react-hook-form'
 import { Input } from '@/components/ui/Input'
 import type { CheckoutFormData } from '@/features/checkout/types/checkout.types'
-import { formatCpf } from '@/utils/masks'
+import { formatCardExpiry, formatCardNumber, formatCpf, formatSecurityCode } from '@/utils/masks'
 
 interface CreditCardFieldsProps {
   register: UseFormRegister<CheckoutFormData>
@@ -48,7 +48,9 @@ export function CreditCardFields({
           error={errors.card?.cardNumber?.message}
           placeholder="0000 0000 0000 0000"
           tone="dark"
-          {...register('card.cardNumber')}
+          {...register('card.cardNumber', {
+            onChange: (event) => setValue('card.cardNumber', formatCardNumber(event.target.value)),
+          })}
         />
         <Input
           id="expiry"
@@ -56,15 +58,20 @@ export function CreditCardFields({
           error={errors.card?.expiry?.message}
           placeholder="12/29"
           tone="dark"
-          {...register('card.expiry')}
+          {...register('card.expiry', {
+            onChange: (event) => setValue('card.expiry', formatCardExpiry(event.target.value)),
+          })}
         />
         <Input
           id="cvv"
           label="CVV"
           error={errors.card?.cvv?.message}
           placeholder="123"
+          inputMode="numeric"
           tone="dark"
-          {...register('card.cvv')}
+          {...register('card.cvv', {
+            onChange: (event) => setValue('card.cvv', formatSecurityCode(event.target.value)),
+          })}
         />
         <Input
           id="installments"

@@ -1,5 +1,8 @@
+'use client'
+
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import {
   FiBookOpen,
   FiMenu,
@@ -29,7 +32,7 @@ export function Navbar({
   minimalTheme = 'light',
 }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const { pathname } = useLocation()
+  const pathname = usePathname()
   const isHome = pathname === ROUTES.home
 
   if (minimal) {
@@ -50,7 +53,7 @@ export function Navbar({
               'flex items-center gap-3',
               isDarkMinimal ? 'text-white' : 'text-brand-950',
             )}
-            to={ROUTES.home}
+            href={ROUTES.home}
           >
             <div
               className={cn(
@@ -75,7 +78,7 @@ export function Navbar({
             </div>
           </Link>
 
-          <Link to={ROUTES.checkout}>
+          <Link href={ROUTES.checkout}>
             <Button
               className={cn(
                 isDarkMinimal &&
@@ -106,7 +109,7 @@ export function Navbar({
               {mobileOpen ? <FiX className="size-6" /> : <FiMenu className="size-6" />}
             </button>
 
-            <Link to={ROUTES.home}>
+            <Link href={ROUTES.home}>
               <BrandWordmark className="text-2xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(192,192,192,0.4)]" />
             </Link>
           </div>
@@ -123,7 +126,7 @@ export function Navbar({
             ))}
           </nav>
 
-          <Link to={ROUTES.checkout} className="hidden md:inline-flex">
+          <Link href={ROUTES.checkout} className="hidden md:inline-flex">
             <FiBookOpen className="size-6 text-nymph-400" />
           </Link>
         </div>
@@ -151,7 +154,7 @@ export function Navbar({
   return (
     <header className="sticky top-0 z-30 border-b border-white/70 bg-brand-50/90 backdrop-blur">
       <div className="page-shell flex items-center justify-between py-4">
-        <Link className="flex items-center gap-3 text-brand-950" to={ROUTES.home}>
+        <Link className="flex items-center gap-3 text-brand-950" href={ROUTES.home}>
           <div className="flex size-11 items-center justify-center rounded-full bg-brand-900 text-brand-50">
             <FiBookOpen />
           </div>
@@ -162,13 +165,13 @@ export function Navbar({
         </Link>
 
         <nav className="hidden items-center gap-6 text-sm font-medium text-brand-700 md:flex">
-          <a href="/#sinopse">Sinopse</a>
-          <a href="/#comprar">Comprar</a>
-          <Link to={ROUTES.bookDetails}>Detalhes</Link>
-          <a href="/#faq">FAQ</a>
+          <a href={`${ROUTES.home}#sinopse`}>Sinopse</a>
+          <a href={`${ROUTES.home}#comprar`}>Comprar</a>
+          <Link href={ROUTES.bookDetails}>Detalhes</Link>
+          <a href={`${ROUTES.home}#faq`}>FAQ</a>
         </nav>
 
-        <Link to={ROUTES.checkout}>
+        <Link href={ROUTES.checkout}>
           <Button className={cn('hidden sm:inline-flex')} variant="secondary">
             <FiShoppingBag />
             Comprar

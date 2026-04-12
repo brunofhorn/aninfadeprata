@@ -1,4 +1,6 @@
-import { useNavigate } from 'react-router-dom'
+'use client'
+
+import { useRouter } from 'next/navigation'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { Seo } from '@/components/common/Seo'
 import { ROUTES } from '@/constants/routes'
@@ -15,13 +17,13 @@ import type { ProductVariant } from '@/features/catalog/types/catalog.types'
 import { useCheckout } from '@/features/checkout/hooks/useCheckout'
 
 export function HomePage() {
-  const navigate = useNavigate()
+  const router = useRouter()
   const { data: book, isLoading } = useBook()
   const { setSelectedProduct } = useCheckout()
 
   const handleSelectProduct = (product: ProductVariant) => {
     setSelectedProduct(product)
-    navigate(ROUTES.checkout)
+    router.push(ROUTES.checkout)
   }
 
   if (isLoading || !book) {

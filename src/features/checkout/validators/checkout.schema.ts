@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import type { ProductVariant } from '@/features/catalog/types/catalog.types'
+import type { PaymentMethod } from '@/types/enums'
 import { PAYMENT_METHODS } from '@/types/enums'
 import { onlyDigits } from '@/utils/masks'
 
@@ -32,7 +33,10 @@ const cardSchema = z.object({
   installments: z.coerce.number().min(1).max(6),
 })
 
-export function createCheckoutSchema(selectedProduct: ProductVariant | null) {
+export function createCheckoutSchema(
+  selectedProduct: ProductVariant | null,
+  activePaymentMethod?: PaymentMethod,
+) {
   return z
     .object({
       customer: customerSchema,
@@ -43,6 +47,8 @@ export function createCheckoutSchema(selectedProduct: ProductVariant | null) {
       card: cardSchema.partial().optional(),
     })
     .superRefine((values, ctx) => {
+      const effectivePaymentMethod = activePaymentMethod ?? values.paymentMethod
+
       if (selectedProduct?.shippingRequired) {
         const addressResult = addressSchema.safeParse(values.shippingAddress)
 
@@ -57,7 +63,7 @@ export function createCheckoutSchema(selectedProduct: ProductVariant | null) {
         }
       }
 
-      if (values.paymentMethod === PAYMENT_METHODS.CREDIT_CARD) {
+      if (effectivePaymentMethod === PAYMENT_METHODS.CREDIT_CARD) {
         const cardResult = cardSchema.safeParse(values.card)
 
         if (!cardResult.success) {

@@ -1,16 +1,18 @@
-import { Outlet } from 'react-router-dom'
+'use client'
+
+import type { PropsWithChildren } from 'react'
 import { Footer } from '@/components/common/Footer'
 import { Navbar } from '@/components/common/Navbar'
 import { useScrollToTop } from '@/hooks/useScrollToTop'
 
-export function LegalLayout() {
+export function LegalLayout({ children }: PropsWithChildren) {
   useScrollToTop()
 
   return (
     <div className="min-h-screen">
       <Navbar minimal />
       <main className="page-shell py-12 sm:py-16">
-        <Outlet />
+        {children}
       </main>
       <Footer />
     </div>

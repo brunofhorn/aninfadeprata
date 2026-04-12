@@ -46,7 +46,7 @@ export function ContactSection() {
         <img
           alt="Floresta noturna"
           className="h-full w-full object-cover"
-          src={contactBackground}
+          src={contactBackground.src}
         />
       </div>
 

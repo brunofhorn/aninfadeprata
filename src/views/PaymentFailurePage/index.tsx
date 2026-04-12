@@ -1,12 +1,14 @@
-import { Link, useSearchParams } from 'react-router-dom'
+import Link from 'next/link'
 import { FiAlertCircle } from 'react-icons/fi'
 import { Seo } from '@/components/common/Seo'
 import { Button } from '@/components/ui/Button'
 import { ROUTES } from '@/constants/routes'
 
-export function PaymentFailurePage() {
-  const [params] = useSearchParams()
-  const orderId = params.get('orderId')
+interface PaymentFailurePageProps {
+  orderId?: string
+}
+
+export function PaymentFailurePage({ orderId }: PaymentFailurePageProps) {
 
   return (
     <>
@@ -18,10 +20,10 @@ export function PaymentFailurePage() {
           O pedido {orderId ? <strong>{orderId}</strong> : ''} nao foi finalizado. O fluxo ja esta preparado para tratar expiracao do Pix, recusas e tentativas de novo pagamento.
         </p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link to={ROUTES.checkout}>
+          <Link href={ROUTES.checkout}>
             <Button>Tentar novamente</Button>
           </Link>
-          <Link to={ROUTES.home}>
+          <Link href={ROUTES.home}>
             <Button variant="secondary">Voltar para a home</Button>
           </Link>
         </div>

@@ -1,4 +1,6 @@
-import { useNavigate } from 'react-router-dom'
+'use client'
+
+import { useRouter } from 'next/navigation'
 import { BrandWordmark } from '@/components/common/BrandWordmark'
 import { ErrorState } from '@/components/common/ErrorState'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'
@@ -12,13 +14,13 @@ import type { ProductVariant } from '@/features/catalog/types/catalog.types'
 import { useCheckout } from '@/features/checkout/hooks/useCheckout'
 
 export function BookDetailsPage() {
-  const navigate = useNavigate()
+  const router = useRouter()
   const { data: book, isLoading } = useBook()
   const { setSelectedProduct } = useCheckout()
 
   const handleSelectProduct = (product: ProductVariant) => {
     setSelectedProduct(product)
-    navigate(ROUTES.checkout)
+    router.push(ROUTES.checkout)
   }
 
   if (isLoading) {
@@ -72,7 +74,7 @@ export function BookDetailsPage() {
         <div className="surface-card p-8">
           <h2 className="text-3xl">Sinopse estendida</h2>
           <p className="mt-4 text-brand-700">{book.synopsis}</p>
-          <Button className="mt-8" onClick={() => navigate(ROUTES.home)}>
+          <Button className="mt-8" onClick={() => router.push(ROUTES.home)}>
             Voltar para a landing
           </Button>
         </div>

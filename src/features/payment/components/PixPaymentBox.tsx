@@ -33,7 +33,7 @@ export function PixPaymentBox({
           </p>
           <h2 className="mt-2 text-3xl text-white">Finalize a compra no seu banco</h2>
           <p className="mt-3 text-white/65">
-            O checkout acompanha o status automaticamente e redireciona quando o backend confirmar o pagamento.
+            Este checkout gera um Pix estatico real. O pagamento vai para a chave configurada, mas a confirmacao nao acontece automaticamente nesta tela.
           </p>
 
           <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm text-white/75">
@@ -45,7 +45,7 @@ export function PixPaymentBox({
             </p>
             <p className="mt-3 flex items-center gap-2 text-nymph-300/80">
               <FiClock />
-              Expira em {new Date(pixPayment.expiresAt).toLocaleTimeString('pt-BR')}
+              O app do banco mostrara o nome oficial cadastrado na chave Pix antes da confirmacao.
             </p>
           </div>
 

@@ -1,5 +1,8 @@
 import { checkoutService } from '@/features/checkout/services/checkout.service'
 import type { CardPaymentPayload, PaymentStatusResponse, PixPaymentResponse } from '@/features/payment/types/payment.types'
+import { buildPixQrCodeImageUrl, generateStaticPixPayload } from '@/features/payment/utils/pix'
+import { API_ENDPOINTS } from '@/integrations/api/endpoints'
+import { api } from '@/integrations/api/axios'
 import { PAYMENT_METHODS, PAYMENT_STATUSES } from '@/types/enums'
 import { getSessionItem, setSessionItem } from '@/utils/storage'
 
@@ -27,9 +30,29 @@ export const paymentService = {
   async createPixPayment(orderId: string): Promise<PixPaymentResponse> {
     await sleep(450)
 
+    const order = await checkoutService.getOrderById(orderId)
+
+    if (!order) {
+      throw new Error('Pedido nao encontrado para gerar o Pix.')
+    }
+
+    const pixKey = process.env.NEXT_PUBLIC_PIX_KEY?.trim()
+
+    if (!pixKey) {
+      throw new Error('A chave Pix nao foi configurada no ambiente.')
+    }
+
+    const receiverName = process.env.NEXT_PUBLIC_PIX_RECEIVER_NAME?.trim() || 'SARA BORGES'
+    const receiverCity = process.env.NEXT_PUBLIC_PIX_RECEIVER_CITY?.trim() || 'SAO JOSE'
     const paymentId = crypto.randomUUID()
-    const expiresAt = new Date(Date.now() + 1000 * 60 * 20).toISOString()
     const current = getPayments()
+    const qrCodeText = generateStaticPixPayload({
+      pixKey,
+      receiverName,
+      receiverCity,
+      amount: order.total,
+      txid: order.code,
+    })
 
     savePayments([
       {
@@ -37,7 +60,6 @@ export const paymentService = {
         paymentId,
         method: PAYMENT_METHODS.PIX,
         createdAt: new Date().toISOString(),
-        expiresAt,
         status: PAYMENT_STATUSES.AWAITING_PAYMENT,
       },
       ...current.filter((item) => item.orderId !== orderId),
@@ -47,14 +69,37 @@ export const paymentService = {
       paymentId,
       paymentMethod: PAYMENT_METHODS.PIX,
       status: PAYMENT_STATUSES.AWAITING_PAYMENT,
-      qrCodeText: `00020126580014br.gov.bcb.pix0136demo-pix-${orderId.slice(0, 8)}`,
-      qrCodeImageUrl:
-        'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=PIX%20A%20NINFA%20DE%20PRATA',
-      expiresAt,
+      qrCodeText,
+      qrCodeImageUrl: buildPixQrCodeImageUrl(qrCodeText),
     }
   },
 
   async payWithCard(payload: CardPaymentPayload): Promise<PaymentStatusResponse> {
+    const pagBankPublicKey = process.env.NEXT_PUBLIC_PAGBANK_PUBLIC_KEY?.trim()
+
+    if (pagBankPublicKey) {
+      const response = await api.post<PaymentStatusResponse>(
+        API_ENDPOINTS.createCardPayment(payload.orderId),
+        {
+          encrypted_card: payload.encryptedCard,
+          installments: payload.installments,
+          holder_name: payload.holderName,
+          holder_cpf: payload.holderCpf,
+        },
+      )
+
+      const order = await checkoutService.getOrderById(payload.orderId)
+
+      if (order) {
+        checkoutService.updateOrder({
+          ...order,
+          paymentStatus: response.data.status,
+        })
+      }
+
+      return response.data
+    }
+
     await sleep(900)
 
     const paymentId = crypto.randomUUID()
@@ -97,43 +142,11 @@ export const paymentService = {
       throw new Error('Pagamento nao encontrado.')
     }
 
-    let nextStatus = payment.status
-
-    if (
-      payment.method === PAYMENT_METHODS.PIX &&
-      payment.status === PAYMENT_STATUSES.AWAITING_PAYMENT
-    ) {
-      const createdAt = new Date(payment.createdAt).getTime()
-      const elapsed = Date.now() - createdAt
-
-      if (elapsed >= 15000) {
-        nextStatus = PAYMENT_STATUSES.PAID
-      }
-    }
-
-    if (payment.expiresAt && new Date(payment.expiresAt).getTime() < Date.now()) {
-      nextStatus = PAYMENT_STATUSES.EXPIRED
-    }
-
-    if (nextStatus !== payment.status) {
-      const nextPayment = { ...payment, status: nextStatus }
-      savePayments(getPayments().map((item) => (item.orderId === orderId ? nextPayment : item)))
-
-      const order = await checkoutService.getOrderById(orderId)
-      if (order) {
-        checkoutService.updateOrder({
-          ...order,
-          paymentStatus: nextStatus,
-        })
-      }
-    }
-
     return {
       orderId,
       paymentId: payment.paymentId,
       method: payment.method,
-      status: nextStatus,
-      paidAt: nextStatus === PAYMENT_STATUSES.PAID ? new Date().toISOString() : undefined,
+      status: payment.status,
     }
   },
 }

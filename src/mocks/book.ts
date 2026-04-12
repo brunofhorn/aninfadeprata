@@ -140,7 +140,7 @@ export const bookMock: Book = {
       type: PRODUCT_TYPES.EPUB,
       name: 'Digital EPUB & PDF',
       description: 'Arquivo flexivel para Kindle, Kobo, Boox e leitores compatíveis.',
-      price: 12.50,
+      price: 1.0,
       compareAtPrice: 39.9,
       shippingRequired: false,
       autographAvailable: false,

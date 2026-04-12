@@ -12,12 +12,12 @@ export interface PixPaymentResponse {
   status: PaymentStatus
   qrCodeText: string
   qrCodeImageUrl: string
-  expiresAt: string
+  expiresAt?: string
 }
 
 export interface CardPaymentPayload {
   orderId: string
-  cardToken: string
+  encryptedCard: string
   installments: number
   holderName: string
   holderCpf: string

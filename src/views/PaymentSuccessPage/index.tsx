@@ -1,12 +1,14 @@
-import { Link, useSearchParams } from 'react-router-dom'
+import Link from 'next/link'
 import { FiCheckCircle } from 'react-icons/fi'
 import { Seo } from '@/components/common/Seo'
 import { Button } from '@/components/ui/Button'
 import { ROUTES } from '@/constants/routes'
 
-export function PaymentSuccessPage() {
-  const [params] = useSearchParams()
-  const orderId = params.get('orderId')
+interface PaymentSuccessPageProps {
+  orderId?: string
+}
+
+export function PaymentSuccessPage({ orderId }: PaymentSuccessPageProps) {
 
   return (
     <>
@@ -18,10 +20,10 @@ export function PaymentSuccessPage() {
           Pedido {orderId ? <strong>{orderId}</strong> : 'gerado'} aprovado. Para itens digitais, o proximo passo e liberar acesso por email. Para itens fisicos, o backend pode seguir com separacao e rastreio.
         </p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link to={ROUTES.home}>
+          <Link href={ROUTES.home}>
             <Button>Voltar para a home</Button>
           </Link>
-          <Link to={ROUTES.bookDetails}>
+          <Link href={ROUTES.bookDetails}>
             <Button variant="secondary">Ver detalhes do livro</Button>
           </Link>
         </div>

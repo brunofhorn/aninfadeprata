@@ -1,5 +1,7 @@
+'use client'
+
 import { motion } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import { FiArrowRight, FiStar } from 'react-icons/fi'
 import { IoLeafOutline } from 'react-icons/io5'
 import { LuSparkles } from 'react-icons/lu'
@@ -13,7 +15,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ book }: HeroSectionProps) {
-  const navigate = useNavigate()
+  const router = useRouter()
 
   return (
     <section
@@ -57,7 +59,7 @@ export function HeroSection({ book }: HeroSectionProps) {
               className="rounded-xl bg-linear-to-r from-silver-300 to-silver-200 px-8 py-4 font-bold text-forest-900 shadow-[0_0_20px_rgba(237,177,255,0.3)] hover:scale-105"
               type="button"
               variant="ghost"
-              onClick={() => navigate(ROUTES.checkout)}
+              onClick={() => router.push(ROUTES.checkout)}
             >
               Garantir meu exemplar
               <FiArrowRight />

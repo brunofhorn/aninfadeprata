@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom'
+'use client'
+
+import Link from 'next/link'
 import { Seo } from '@/components/common/Seo'
 import { Button } from '@/components/ui/Button'
 import { ROUTES } from '@/constants/routes'
@@ -13,7 +15,7 @@ export function NotFoundPage() {
           <p className="mt-4 text-brand-700">
             A pagina nao existe ou foi movida dentro da estrutura do projeto.
           </p>
-          <Link className="mt-8 inline-flex" to={ROUTES.home}>
+          <Link className="mt-8 inline-flex" href={ROUTES.home}>
             <Button>Voltar para a home</Button>
           </Link>
         </div>
