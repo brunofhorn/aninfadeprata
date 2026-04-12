@@ -12,8 +12,8 @@ export function FAQSection({ items }: FAQSectionProps) {
   return (
     <section id="faq" className="bg-forest-900 py-24 text-white">
       <div className="page-shell max-w-3xl">
-        <h2 className="mb-12 text-center font-display text-4xl font-bold">
-          Duvidas comuns
+        <h2 className="mb-12 text-center font-display text-4xl font-bold text-white">
+          Dúvidas comuns
         </h2>
         <div className="space-y-4">
           {items.map((item, index) => (

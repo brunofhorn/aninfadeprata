@@ -7,7 +7,7 @@ interface AuthorSectionProps {
 
 export function AuthorSection({ author }: AuthorSectionProps) {
   return (
-    <section className="bg-forest-800 py-24 text-white">
+    <section className="bg-mystic-700 py-24 text-white">
       <div className="page-shell">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-12 md:flex-row">
           <div className="relative h-64 w-64 shrink-0 md:h-80 md:w-80">

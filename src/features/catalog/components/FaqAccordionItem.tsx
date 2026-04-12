@@ -24,7 +24,7 @@ export function FaqAccordionItem({
         <span className="font-display text-lg font-bold text-white">{item.question}</span>
         <FiChevronDown
           className={cn(
-            'size-5 shrink-0 text-mystic-400 transition-transform',
+            'size-5 shrink-0 text-mystic-400 transition-transform cursor-pointer',
             isOpen && 'rotate-180',
           )}
         />

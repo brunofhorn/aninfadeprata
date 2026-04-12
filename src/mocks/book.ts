@@ -20,13 +20,13 @@ export const bookMock: Book = {
   categories: ['Fantasia', 'Romance', 'Drama'],
   author: {
     id: 'author-001',
-    name: 'Helena Maris',
+    name: 'Sara Borges',
     headline: 'Autora de fantasia contemporanea e narrativas de atmosfera poetica.',
     bio: 'Helena Maris escreve historias centradas em memoria, identidade e paisagens afetivas. Seus livros investigam o encontro entre o fantastico e o intimo, sempre com foco em personagens que precisam atravessar transformacoes profundas.',
     photoUrl: 'https://picsum.photos/seed/author-helena/600/600',
     socialLinks: [
-      { label: 'Instagram', url: 'https://instagram.com/' },
-      { label: 'Site oficial', url: 'https://example.com/' },
+      { label: 'Instagram', url: 'https://instagram.com/saraborgesch' },
+      { label: 'Site oficial', url: 'https://autorasaraborges.com.br/' },
     ],
   },
   characters: [
@@ -117,21 +117,21 @@ export const bookMock: Book = {
   faqs: [
     {
       id: 'faq-1',
-      question: 'Qual a diferenca entre EPUB e PDF?',
+      question: 'Qual a diferença entre EPUB e PDF?',
       answer:
-        'O EPUB se adapta melhor ao tamanho da tela e costuma ser ideal para e-readers. O PDF preserva o layout original da edicao.',
+        'O EPUB se adapta melhor ao tamanho da tela e costuma ser ideal para e-readers (Kindle, Kobo ou Boox). O PDF preserva o layout original da edição.',
     },
     {
       id: 'faq-2',
-      question: 'Como funciona a versao com autografo?',
+      question: 'Como funciona a versão com autógrafo?',
       answer:
-        'No checkout, a pessoa compradora pode informar uma dedicatoria curta. O pedido segue para a autora apenas apos confirmacao do pagamento.',
+        'No checkout, a pessoa compradora pode informar o nome para autógrafo, e marcar caso queira uma dedicatoria curta. O pedido segue para a autora apenas após a confirmação do pagamento.',
     },
     {
       id: 'faq-3',
-      question: 'O Pix confirma na hora?',
+      question: 'O pagamento por PIX confirma na hora?',
       answer:
-        'Na maioria dos casos sim. O frontend acompanha o status por polling e redireciona automaticamente quando o backend confirma o pagamento.',
+        'Na maioria dos casos sim. O site acompanha o status automaticamente e redireciona quando confirma o pagamento.',
     },
   ],
   variants: [
@@ -139,35 +139,24 @@ export const bookMock: Book = {
       id: 'variant-epub-pdf',
       type: PRODUCT_TYPES.EPUB,
       name: 'Digital EPUB & PDF',
-      description: 'Arquivo flexivel para Kindle, Kobo e leitores compativeis.',
-      price: 29.9,
+      description: 'Arquivo flexivel para Kindle, Kobo, Boox e leitores compatíveis.',
+      price: 12.50,
       compareAtPrice: 39.9,
       shippingRequired: false,
       autographAvailable: false,
-      deliveryEstimate: 'Entrega imediata por email',
-    },
-    {
-      id: 'variant-physical',
-      type: PRODUCT_TYPES.PHYSICAL,
-      name: 'Fisico',
-      description: 'Edicao impressa com acabamento premium e marcador.',
-      price: 59.9,
-      compareAtPrice: 69.9,
-      shippingRequired: true,
-      autographAvailable: false,
-      deliveryEstimate: 'Postagem em ate 4 dias uteis',
+      deliveryEstimate: 'Entrega imediata por e-mail.',
     },
     {
       id: 'variant-signed-gift',
       type: PRODUCT_TYPES.PHYSICAL_SIGNED_GIFT,
-      name: 'Fisico com autografo e brindes',
-      description: 'Livro autografado com marcador especial, card e envelope tematico.',
+      name: 'Físico com autógrafo e brindes',
+      description: 'Livro autografado com marcador especial, adesivos e outros brindes.',
       price: 99.9,
       compareAtPrice: 119.9,
       shippingRequired: true,
       autographAvailable: true,
-      giftsIncluded: ['Marcador metalizado', 'Card colecionavel', 'Envelope tematico'],
-      deliveryEstimate: 'Postagem em ate 7 dias uteis',
+      giftsIncluded: ['Autografado', 'Marcador personalizado', '6 adesivos', 'Brindes extras'],
+      deliveryEstimate: 'Postagem em até 7 dias úteis.',
     },
   ],
 }

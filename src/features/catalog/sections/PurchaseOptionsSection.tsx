@@ -13,11 +13,11 @@ export function PurchaseOptionsSection({
   return (
     <section id="comprar" className="relative overflow-hidden bg-forest-900 py-24 text-white">
       <div className="page-shell max-w-6xl">
-        <h2 className="mb-16 text-center font-display text-4xl font-bold">
-          Traga a magia para casa
+        <h2 className="mb-16 text-center font-display text-4xl font-bold text-white">
+          Leve a magia para sua casa
         </h2>
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-2">
           {products.map((product, index) => (
             <PricingCard
               key={product.id}

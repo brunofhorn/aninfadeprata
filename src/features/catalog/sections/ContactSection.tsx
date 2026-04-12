@@ -35,7 +35,7 @@ export function ContactSection() {
       reset()
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'Nao foi possivel enviar a mensagem.'
+        error instanceof Error ? error.message : 'Não foi possível enviar a mensagem.'
       toast.error(message)
     }
   }
