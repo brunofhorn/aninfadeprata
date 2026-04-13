@@ -419,10 +419,6 @@ export type AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput = {
   deleteMany?: Prisma.AdminAuditLogScalarWhereInput | Prisma.AdminAuditLogScalarWhereInput[]
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type AdminAuditLogCreateWithoutAdminUserInput = {
   id?: string
   action: string

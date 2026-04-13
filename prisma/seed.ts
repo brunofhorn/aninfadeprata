@@ -58,7 +58,9 @@ async function main() {
   })
 
   try {
-    const adminEmail = process.env.SEED_ADMIN_EMAIL?.trim() || 'admin@aninfadeprata.com'
+    const adminEmail =
+      (process.env.SEED_ADMIN_EMAIL?.trim() || 'admin@aninfadeprata.com').toLowerCase()
+    const adminUsername = (process.env.SEED_ADMIN_USERNAME?.trim() || 'saraadmin').toLowerCase()
     const adminPassword = process.env.SEED_ADMIN_PASSWORD?.trim() || 'Admin123!'
     const adminName = process.env.SEED_ADMIN_NAME?.trim() || 'Sara Borges Admin'
 
@@ -68,12 +70,14 @@ async function main() {
       },
       update: {
         name: adminName,
+        username: adminUsername,
         passwordHash: hashPassword(adminEmail, adminPassword),
         role: 'SUPER_ADMIN',
         isActive: true,
       },
       create: {
         email: adminEmail,
+        username: adminUsername,
         name: adminName,
         passwordHash: hashPassword(adminEmail, adminPassword),
         role: 'SUPER_ADMIN',
@@ -584,6 +588,7 @@ async function main() {
 
     console.log('Seed concluido com sucesso.')
     console.log(`Admin: ${adminEmail}`)
+    console.log(`Usuario: ${adminUsername}`)
     console.log(`Senha seed: ${adminPassword}`)
     console.log(`Livro: ${book.title}`)
     console.log(`Pedido fake: ${fakeOrder.code}`)
