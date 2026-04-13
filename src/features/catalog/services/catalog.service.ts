@@ -1,11 +1,10 @@
-import { bookMock } from '@/mocks/book'
 import type { Book } from '@/features/catalog/types/catalog.types'
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+import { API_ENDPOINTS } from '@/integrations/api/endpoints'
+import { api } from '@/integrations/api/axios'
 
 export const catalogService = {
   async getFeaturedBook(): Promise<Book> {
-    await sleep(250)
-    return bookMock
+    const response = await api.get<Book>(API_ENDPOINTS.bookBySlug('a-ninfa-de-prata'))
+    return response.data
   },
 }

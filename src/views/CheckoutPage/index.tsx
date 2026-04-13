@@ -205,15 +205,17 @@ export function CheckoutPage() {
       const installments = data.card?.installments ?? 1
       const pagBankPublicKey = process.env.NEXT_PUBLIC_PAGBANK_PUBLIC_KEY?.trim()
 
-      const encryptedCard = pagBankPublicKey
-        ? await encryptCardWithPagBank({
-            publicKey: pagBankPublicKey,
-            holderName,
-            cardNumber: data.card?.cardNumber ?? '',
-            expiry: data.card?.expiry ?? '',
-            securityCode: data.card?.cvv ?? '',
-          })
-        : `mock-${(data.card?.cardNumber ?? '').slice(-4) || '1111'}`
+      if (!pagBankPublicKey) {
+        throw new Error('NEXT_PUBLIC_PAGBANK_PUBLIC_KEY nao foi configurada para o checkout transparente.')
+      }
+
+      const encryptedCard = await encryptCardWithPagBank({
+        publicKey: pagBankPublicKey,
+        holderName,
+        cardNumber: data.card?.cardNumber ?? '',
+        expiry: data.card?.expiry ?? '',
+        securityCode: data.card?.cvv ?? '',
+      })
 
       const cardResponse = await paymentService.payWithCard({
         orderId: createdOrder.id,
