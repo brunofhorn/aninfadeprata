@@ -1,0 +1,450 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  OPERATIONS
+  FINANCE
+  CONTENT
+  SUPPORT
+}
+
+enum BookStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum ProductType {
+  EPUB
+  PDF
+  PHYSICAL
+  PHYSICAL_SIGNED
+  PHYSICAL_SIGNED_GIFT
+}
+
+enum OrderStatus {
+  DRAFT
+  PENDING_PAYMENT
+  PAID
+  PROCESSING
+  PARTIALLY_FULFILLED
+  FULFILLED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  PIX
+  CREDIT_CARD
+  BOLETO
+  FREE
+}
+
+enum PaymentProvider {
+  PAGBANK
+  MANUAL
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  AWAITING_PAYMENT
+  PAID
+  FAILED
+  EXPIRED
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
+  CHARGEBACK
+}
+
+enum FulfillmentStatus {
+  NOT_REQUIRED
+  PENDING
+  PREPARING
+  SHIPPED
+  DELIVERED
+  RETURNED
+}
+
+enum ContactChannel {
+  SITE
+  INSTAGRAM
+  TIKTOK
+  EMAIL
+  MANUAL
+}
+
+enum WebhookProcessingStatus {
+  PENDING
+  PROCESSED
+  FAILED
+  IGNORED
+}
+
+model AdminUser {
+  id           String          @id @default(cuid())
+  email        String          @unique
+  passwordHash String
+  name         String
+  role         AdminRole
+  isActive     Boolean         @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  auditLogs    AdminAuditLog[]
+}
+
+model AdminAuditLog {
+  id          String     @id @default(cuid())
+  adminUserId String?
+  action      String
+  entityType  String
+  entityId    String?
+  description String?
+  metadata    Json?
+  createdAt   DateTime   @default(now())
+  adminUser   AdminUser? @relation(fields: [adminUserId], references: [id], onDelete: SetNull)
+
+  @@index([adminUserId, createdAt])
+  @@index([entityType, entityId])
+}
+
+model Author {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  headline     String?
+  bio          String?
+  photoUrl     String?
+  websiteUrl   String?
+  instagramUrl String?
+  tiktokUrl    String?
+  skoobUrl     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  books        Book[]
+}
+
+model Book {
+  id              String            @id @default(cuid())
+  authorId        String?
+  slug            String            @unique
+  title           String
+  subtitle        String?
+  tagline         String?
+  description     String
+  synopsis        String?
+  pitch           String?
+  isbn            String?           @unique
+  pageCount       Int?
+  language        String?
+  publicationYear Int?
+  coverImageUrl   String?
+  heroImageUrl    String?
+  status          BookStatus        @default(DRAFT)
+  publishedAt     DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  author          Author?           @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  categories      BookCategory[]
+  chapters        BookChapter[]
+  characters      BookCharacter[]
+  faqItems        BookFaqItem[]
+  locations       BookLocation[]
+  testimonials    BookTestimonial[]
+  variants        ProductVariant[]
+
+  @@index([status, publishedAt])
+}
+
+model Category {
+  id        String         @id @default(cuid())
+  slug      String         @unique
+  name      String         @unique
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  books     BookCategory[]
+}
+
+model BookCategory {
+  bookId     String
+  categoryId String
+  createdAt  DateTime @default(now())
+  book       Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([bookId, categoryId])
+  @@index([categoryId])
+}
+
+model BookChapter {
+  id          String   @id @default(cuid())
+  bookId      String
+  position    Int
+  title       String
+  description String
+  icon        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  book        Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([bookId, position])
+}
+
+model BookCharacter {
+  id          String   @id @default(cuid())
+  bookId      String
+  name        String
+  role        String?
+  description String
+  imageUrl    String?
+  gridSpan    String?
+  position    Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  book        Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId, position])
+}
+
+model BookLocation {
+  id          String   @id @default(cuid())
+  bookId      String
+  name        String
+  description String
+  imageUrl    String?
+  gridSpan    String?
+  position    Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  book        Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId, position])
+}
+
+model BookTestimonial {
+  id         String   @id @default(cuid())
+  bookId     String
+  authorName String
+  text       String
+  highlight  String?
+  position   Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  book       Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId, position])
+}
+
+model BookFaqItem {
+  id        String   @id @default(cuid())
+  bookId    String
+  question  String
+  answer    String
+  position  Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId, position])
+}
+
+model ProductVariant {
+  id                 String      @id @default(cuid())
+  bookId             String
+  sku                String      @unique
+  slug               String      @unique
+  type               ProductType
+  name               String
+  description        String
+  priceAmount        Decimal     @db.Decimal(10, 2)
+  compareAtAmount    Decimal?    @db.Decimal(10, 2)
+  giftsIncluded      String[]
+  shippingRequired   Boolean     @default(false)
+  autographAvailable Boolean     @default(false)
+  deliveryEstimate   String?
+  isActive           Boolean     @default(true)
+  trackInventory     Boolean     @default(false)
+  stockQuantity      Int?
+  lowStockThreshold  Int?
+  sortOrder          Int         @default(0)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  book               Book        @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  orderItems         OrderItem[]
+
+  @@index([bookId, isActive, sortOrder])
+}
+
+model Customer {
+  id             String            @id @default(cuid())
+  email          String            @unique
+  fullName       String
+  cpf            String?           @unique
+  phone          String?
+  marketingOptIn Boolean           @default(false)
+  notes          String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  addresses      CustomerAddress[]
+  orders         Order[]
+}
+
+model CustomerAddress {
+  id            String   @id @default(cuid())
+  customerId    String
+  label         String?
+  recipientName String?
+  zipCode       String
+  street        String
+  number        String
+  complement    String?
+  neighborhood  String
+  city          String
+  state         String
+  country       String   @default("BR")
+  isDefault     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  customer      Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId, isDefault])
+}
+
+model Order {
+  id                String                @id @default(cuid())
+  code              String                @unique
+  customerId        String
+  contactChannel    ContactChannel        @default(SITE)
+  currency          String                @default("BRL")
+  status            OrderStatus           @default(PENDING_PAYMENT)
+  paymentStatus     PaymentStatus         @default(PENDING)
+  fulfillmentStatus FulfillmentStatus     @default(NOT_REQUIRED)
+  subtotalAmount    Decimal               @db.Decimal(10, 2)
+  discountAmount    Decimal               @default(0) @db.Decimal(10, 2)
+  shippingAmount    Decimal               @default(0) @db.Decimal(10, 2)
+  totalAmount       Decimal               @db.Decimal(10, 2)
+  itemCount         Int                   @default(1)
+  giftWrap          Boolean               @default(false)
+  autographMessage  String?
+  notes             String?
+  paidAt            DateTime?
+  cancelledAt       DateTime?
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  customer          Customer              @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  items             OrderItem[]
+  payments          Payment[]
+  shippingAddress   OrderShippingAddress?
+
+  @@index([customerId, createdAt])
+  @@index([status, createdAt])
+  @@index([paymentStatus, createdAt])
+  @@index([fulfillmentStatus, createdAt])
+}
+
+model OrderItem {
+  id                 String          @id @default(cuid())
+  orderId            String
+  productVariantId   String?
+  sku                String?
+  title              String
+  productType        ProductType
+  quantity           Int
+  unitPriceAmount    Decimal         @db.Decimal(10, 2)
+  totalPriceAmount   Decimal         @db.Decimal(10, 2)
+  shippingRequired   Boolean         @default(false)
+  autographAvailable Boolean         @default(false)
+  createdAt          DateTime        @default(now())
+  order              Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productVariant     ProductVariant? @relation(fields: [productVariantId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([productVariantId])
+}
+
+model OrderShippingAddress {
+  id            String   @id @default(cuid())
+  orderId       String   @unique
+  recipientName String?
+  zipCode       String
+  street        String
+  number        String
+  complement    String?
+  neighborhood  String
+  city          String
+  state         String
+  country       String   @default("BR")
+  createdAt     DateTime @default(now())
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id                String          @id @default(cuid())
+  orderId           String
+  provider          PaymentProvider
+  method            PaymentMethod
+  status            PaymentStatus   @default(PENDING)
+  amount            Decimal         @db.Decimal(10, 2)
+  currency          String          @default("BRL")
+  installments      Int?
+  providerPaymentId String?
+  providerReference String?
+  holderName        String?
+  holderCpf         String?
+  cardBrand         String?
+  cardFirstSix      String?
+  cardLastFour      String?
+  pixQrCodeText     String?
+  pixQrCodeImageUrl String?
+  pixExpiresAt      DateTime?
+  paidAt            DateTime?
+  failureReason     String?
+  rawResponse       Json?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  order             Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  events            PaymentEvent[]
+
+  @@index([orderId, createdAt])
+  @@index([provider, providerPaymentId])
+  @@index([status, createdAt])
+}
+
+model PaymentEvent {
+  id              String         @id @default(cuid())
+  paymentId       String
+  providerEventId String?
+  eventType       String
+  previousStatus  PaymentStatus?
+  nextStatus      PaymentStatus?
+  payload         Json?
+  createdAt       DateTime       @default(now())
+  payment         Payment        @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@index([paymentId, createdAt])
+  @@index([providerEventId])
+}
+
+model WebhookEvent {
+  id               String                  @id @default(cuid())
+  provider         PaymentProvider
+  externalEventId  String?
+  eventType        String
+  processingStatus WebhookProcessingStatus @default(PENDING)
+  payload          Json
+  receivedAt       DateTime                @default(now())
+  processedAt      DateTime?
+  errorMessage     String?
+
+  @@index([provider, externalEventId])
+  @@index([processingStatus, receivedAt])
+}
