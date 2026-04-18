@@ -48,7 +48,7 @@ enum PaymentMethod {
 }
 
 enum PaymentProvider {
-  PAGBANK
+  MERCADO_PAGO
   MANUAL
 }
 

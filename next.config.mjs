@@ -15,8 +15,6 @@ const nextConfig = {
       process.env.NEXT_PUBLIC_PIX_RECEIVER_NAME ?? process.env.VITE_PIX_RECEIVER_NAME ?? '',
     NEXT_PUBLIC_PIX_RECEIVER_CITY:
       process.env.NEXT_PUBLIC_PIX_RECEIVER_CITY ?? process.env.VITE_PIX_RECEIVER_CITY ?? '',
-    NEXT_PUBLIC_PAGBANK_PUBLIC_KEY:
-      process.env.NEXT_PUBLIC_PAGBANK_PUBLIC_KEY ?? process.env.VITE_PAGBANK_PUBLIC_KEY ?? '',
   },
 }
 

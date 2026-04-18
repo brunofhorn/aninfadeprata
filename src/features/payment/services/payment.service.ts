@@ -1,4 +1,5 @@
 import type {
+  CardPaymentResponse,
   CardPaymentPayload,
   PaymentStatusResponse,
   PixPaymentResponse,
@@ -12,15 +13,10 @@ export const paymentService = {
     return response.data
   },
 
-  async payWithCard(payload: CardPaymentPayload): Promise<PaymentStatusResponse> {
-    const response = await api.post<PaymentStatusResponse>(
+  async payWithCard(payload: CardPaymentPayload): Promise<CardPaymentResponse> {
+    const response = await api.post<CardPaymentResponse>(
       API_ENDPOINTS.createCardPayment(payload.orderId),
-      {
-        encrypted_card: payload.encryptedCard,
-        installments: payload.installments,
-        holder_name: payload.holderName,
-        holder_cpf: payload.holderCpf,
-      },
+      payload,
     )
 
     return response.data

@@ -65,7 +65,7 @@ export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
 
 
 export const PaymentProvider = {
-  PAGBANK: 'PAGBANK',
+  MERCADO_PAGO: 'MERCADO_PAGO',
   MANUAL: 'MANUAL'
 } as const
 

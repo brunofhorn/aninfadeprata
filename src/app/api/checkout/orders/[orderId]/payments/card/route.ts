@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server'
-import { serializePaymentStatus } from '@/server/checkout/mappers'
-import { createCardPaymentSchema } from '@/server/checkout/schemas'
 import { getPrismaClient, hasDatabaseUrl } from '@/server/db/prisma'
-import { pagBankRequest } from '@/server/pagbank/client'
-import { getChargeFromOrderPayload, mapPagBankChargeStatus, type PagBankOrderResponse } from '@/server/pagbank/mappers'
+import { mercadoPagoRequest } from '@/server/mercado-pago/client'
+import {
+  mapMercadoPagoPaymentStatus,
+  normalizeMercadoPagoPaymentId,
+  type MercadoPagoPayment,
+} from '@/server/mercado-pago/mappers'
 
 export const runtime = 'nodejs'
 
@@ -11,6 +13,35 @@ interface RouteContext {
   params: Promise<{
     orderId: string
   }>
+}
+
+function getBaseUrl(request: Request) {
+  const configuredUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || process.env.APP_URL?.trim()
+
+  if (configuredUrl) {
+    return configuredUrl.replace(/\/$/, '')
+  }
+
+  const url = new URL(request.url)
+  return `${url.protocol}//${url.host}`
+}
+
+function splitFullName(fullName: string) {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean)
+  const firstName = parts.shift() ?? fullName
+  const lastName = parts.join(' ')
+
+  return {
+    firstName,
+    lastName: lastName || firstName,
+  }
+}
+
+interface CardPaymentRequestBody {
+  token: string
+  paymentMethodId: string
+  issuerId?: string
+  installments: number
 }
 
 export async function POST(request: Request, context: RouteContext) {
@@ -22,8 +53,8 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   try {
-    const payload = createCardPaymentSchema.parse(await request.json())
     const { orderId } = await context.params
+    const payload = (await request.json()) as CardPaymentRequestBody
     const prisma = getPrismaClient()
     const order = await prisma.order.findUnique({
       where: {
@@ -49,114 +80,132 @@ export async function POST(request: Request, context: RouteContext) {
 
     if (!item) {
       return NextResponse.json(
-        { message: 'Pedido sem itens nao pode ser enviado ao PagBank.' },
+        { message: 'Pedido sem itens nao pode ser cobrado com cartao.' },
         { status: 400 },
       )
     }
 
+    if (!payload.token || !payload.paymentMethodId || !payload.installments) {
+      return NextResponse.json(
+        { message: 'Os dados tokenizados do cartao nao foram informados.' },
+        { status: 400 },
+      )
+    }
+
+    const baseUrl = getBaseUrl(request)
+    const notificationUrl =
+      process.env.MERCADO_PAGO_WEBHOOK_URL?.trim() ||
+      `${baseUrl}/api/webhooks/mercado-pago`
     const digitsPhone = (order.customer.phone ?? '').replace(/\D/g, '')
     const phone =
       digitsPhone.length >= 10
         ? {
-            country: '55',
-            area: digitsPhone.slice(0, 2),
+            area_code: digitsPhone.slice(0, 2),
             number: digitsPhone.slice(2),
-            type: 'MOBILE',
           }
-        : null
+        : undefined
+    const { firstName, lastName } = splitFullName(order.customer.fullName)
+    const webhookUrl = new URL(notificationUrl)
+    webhookUrl.searchParams.set('source_news', 'webhooks')
 
-    const notificationUrl = process.env.PAGBANK_WEBHOOK_URL?.trim()
-    const softDescriptor = process.env.PAGBANK_SOFT_DESCRIPTOR?.trim()
-    const pagBankOrder = await pagBankRequest<PagBankOrderResponse>('/orders', {
-      method: 'POST',
-      body: JSON.stringify({
-        reference_id: order.code,
-        customer: {
-          name: order.customer.fullName,
-          email: order.customer.email,
-          tax_id: order.customer.cpf?.replace(/\D/g, ''),
-          phones: phone ? [phone] : undefined,
-        },
-        items: [
-          {
-            reference_id: item.productVariantId ?? item.id,
-            name: item.title,
-            quantity: item.quantity,
-            unit_amount: Math.round(Number(item.unitPriceAmount) * 100),
-          },
-        ],
-        shipping: order.shippingAddress
-          ? {
-              address: {
-                street: order.shippingAddress.street,
-                number: order.shippingAddress.number,
-                complement: order.shippingAddress.complement ?? undefined,
-                locality: order.shippingAddress.neighborhood,
-                city: order.shippingAddress.city,
-                region_code: order.shippingAddress.state.toUpperCase(),
-                country: 'BRA',
-                postal_code: order.shippingAddress.zipCode.replace(/\D/g, ''),
+    const remotePayment = await mercadoPagoRequest<MercadoPagoPayment>(
+      '/v1/payments',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          additional_info: {
+            items: [
+              {
+                id: item.productVariantId ?? item.id,
+                title: item.title,
+                description: item.title,
+                quantity: item.quantity,
+                unit_price: Number(item.unitPriceAmount),
+                category_id: 'books',
               },
-            }
-          : undefined,
-        notification_urls: notificationUrl ? [notificationUrl] : undefined,
-        charges: [
-          {
-            reference_id: `${order.code}-card`,
-            description: item.title,
-            amount: {
-              value: Math.round(Number(order.totalAmount) * 100),
-              currency: 'BRL',
+            ],
+            payer: {
+              first_name: firstName,
+              last_name: lastName,
+              phone,
+              address: order.shippingAddress
+                ? {
+                    zip_code: order.shippingAddress.zipCode.replace(/\D/g, ''),
+                    street_name: order.shippingAddress.street,
+                    street_number: Number(order.shippingAddress.number.replace(/\D/g, '')) || 0,
+                  }
+                : undefined,
             },
-            payment_method: {
-              type: 'CREDIT_CARD',
-              installments: payload.installments,
-              capture: true,
-              card: {
-                encrypted: payload.encrypted_card,
-                store: false,
-              },
-              holder: {
-                name: payload.holder_name,
-                tax_id: payload.holder_cpf.replace(/\D/g, ''),
-              },
-              ...(softDescriptor ? { soft_descriptor: softDescriptor } : {}),
-            },
+            shipments: order.shippingAddress
+              ? {
+                  receiver_address: {
+                    zip_code: order.shippingAddress.zipCode.replace(/\D/g, ''),
+                    state_name: order.shippingAddress.state.toUpperCase(),
+                    city_name: order.shippingAddress.city,
+                    street_name: order.shippingAddress.street,
+                    street_number:
+                      Number(order.shippingAddress.number.replace(/\D/g, '')) || 0,
+                  },
+                }
+              : undefined,
           },
-        ],
-      }),
-    })
+          binary_mode: false,
+          capture: true,
+          description: item.title,
+          external_reference: order.code,
+          installments: payload.installments,
+          issuer_id: payload.issuerId ? Number(payload.issuerId) : undefined,
+          notification_url: webhookUrl.toString(),
+          payer: {
+            email: order.customer.email,
+            entity_type: 'individual',
+            type: 'customer',
+            first_name: firstName,
+            last_name: lastName,
+            identification: order.customer.cpf
+              ? {
+                  type: 'CPF',
+                  number: order.customer.cpf.replace(/\D/g, ''),
+                }
+              : undefined,
+          },
+          payment_method_id: payload.paymentMethodId,
+          token: payload.token,
+          transaction_amount: Number(order.totalAmount),
+        }),
+      },
+    )
 
-    const charge = getChargeFromOrderPayload(pagBankOrder)
-
-    if (!charge) {
-      throw new Error('O PagBank nao retornou a cobranca do cartao.')
-    }
-
-    const mappedStatus = mapPagBankChargeStatus(charge.status)
+    const mappedStatus = mapMercadoPagoPaymentStatus(
+      remotePayment.status,
+      remotePayment.status_detail,
+    )
+    const providerPaymentId = normalizeMercadoPagoPaymentId(remotePayment.id)
 
     const payment = await prisma.payment.create({
       data: {
         orderId: order.id,
-        provider: 'PAGBANK',
+        provider: 'MERCADO_PAGO',
         method: 'CREDIT_CARD',
         status: mappedStatus.dbPaymentStatus,
         amount: order.totalAmount,
         installments: payload.installments,
-        holderName: payload.holder_name,
-        holderCpf: payload.holder_cpf,
-        providerPaymentId: charge.id,
-        providerReference: pagBankOrder.id,
-        cardBrand: charge.payment_method?.card?.brand,
-        cardFirstSix: charge.payment_method?.card?.first_digits,
-        cardLastFour: charge.payment_method?.card?.last_digits,
-        paidAt: charge.paid_at ? new Date(charge.paid_at) : null,
-        rawResponse: JSON.parse(JSON.stringify(pagBankOrder)),
+        providerPaymentId,
+        providerReference: order.code,
+        holderName: order.customer.fullName,
+        holderCpf: order.customer.cpf,
+        cardBrand: remotePayment.payment_method_id ?? null,
+        cardFirstSix: remotePayment.card?.first_six_digits ?? null,
+        cardLastFour: remotePayment.card?.last_four_digits ?? null,
+        paidAt: remotePayment.date_approved ? new Date(remotePayment.date_approved) : null,
+        failureReason: remotePayment.status_detail ?? null,
+        rawResponse: JSON.parse(JSON.stringify(remotePayment)),
         events: {
           create: {
-            eventType: `PAGBANK_CARD_${charge.status}`,
+            providerEventId: providerPaymentId,
+            eventType: 'MERCADO_PAGO_PAYMENT_CREATED',
             nextStatus: mappedStatus.dbPaymentStatus,
-            payload: JSON.parse(JSON.stringify(pagBankOrder)),
+            payload: JSON.parse(JSON.stringify(remotePayment)),
           },
         },
       },
@@ -169,29 +218,24 @@ export async function POST(request: Request, context: RouteContext) {
       data: {
         paymentStatus: mappedStatus.dbPaymentStatus,
         status: mappedStatus.dbOrderStatus,
-        paidAt: payment.paidAt,
+        paidAt: remotePayment.date_approved ? new Date(remotePayment.date_approved) : null,
       },
     })
 
-    return NextResponse.json(
-      serializePaymentStatus({
-        id: payment.id,
-        orderId: payment.orderId,
-        method: payment.method,
-        status: payment.status,
-        paidAt: payment.paidAt,
-        pixQrCodeText: payment.pixQrCodeText,
-        pixQrCodeImageUrl: payment.pixQrCodeImageUrl,
-        pixExpiresAt: payment.pixExpiresAt,
-      }),
-    )
+    return NextResponse.json({
+      orderId: order.id,
+      paymentId: payment.id,
+      providerPaymentId,
+      status: mappedStatus.frontendPaymentStatus,
+      statusDetail: remotePayment.status_detail,
+    })
   } catch (error) {
     if (error instanceof Error) {
       return NextResponse.json({ message: error.message }, { status: 400 })
     }
 
     return NextResponse.json(
-      { message: 'Nao foi possivel processar o pagamento com cartao.' },
+      { message: 'Nao foi possivel processar o pagamento com cartao no Mercado Pago.' },
       { status: 500 },
     )
   }

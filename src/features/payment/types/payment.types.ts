@@ -17,10 +17,10 @@ export interface PixPaymentResponse {
 
 export interface CardPaymentPayload {
   orderId: string
-  encryptedCard: string
+  token: string
+  paymentMethodId: string
+  issuerId?: string
   installments: number
-  holderName: string
-  holderCpf: string
 }
 
 export interface PaymentStatusResponse {
@@ -29,4 +29,12 @@ export interface PaymentStatusResponse {
   method: PaymentMethod
   status: PaymentStatus
   paidAt?: string
+}
+
+export interface CardPaymentResponse {
+  orderId: string
+  paymentId: string
+  providerPaymentId?: string
+  status: PaymentStatus
+  statusDetail?: string
 }

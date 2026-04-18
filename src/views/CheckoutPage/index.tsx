@@ -19,13 +19,11 @@ import { useCheckout } from '@/features/checkout/hooks/useCheckout'
 import { checkoutService } from '@/features/checkout/services/checkout.service'
 import type { CheckoutFormData } from '@/features/checkout/types/checkout.types'
 import { createCheckoutSchema } from '@/features/checkout/validators/checkout.schema'
-import { CreditCardFields } from '@/features/payment/components/CreditCardFields'
-import { usePagBankSdk } from '@/features/payment/hooks/usePagBankSdk'
+import { MercadoPagoCardFields } from '@/features/payment/components/MercadoPagoCardFields'
 import { PaymentMethodSelector } from '@/features/payment/components/PaymentMethodSelector'
 import { PixPaymentBox } from '@/features/payment/components/PixPaymentBox'
 import { usePaymentStatus } from '@/features/payment/hooks/usePaymentStatus'
 import { paymentService } from '@/features/payment/services/payment.service'
-import { encryptCardWithPagBank } from '@/features/payment/utils/pagbank'
 import { PAYMENT_METHODS, PAYMENT_STATUSES } from '@/types/enums'
 
 function getFirstFormErrorMessage(errors: FieldErrors<CheckoutFormData>): string | null {
@@ -53,6 +51,7 @@ function getFirstFormErrorMessage(errors: FieldErrors<CheckoutFormData>): string
 export function CheckoutPage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isMercadoPagoReady, setIsMercadoPagoReady] = useState(false)
   const {
     selectedProduct,
     setSelectedProduct,
@@ -71,16 +70,13 @@ export function CheckoutPage() {
   )
 
   const selectedProductRef = useRef(selectedProduct)
-  const selectedPaymentMethodRef = useRef(selectedPaymentMethod)
 
   selectedProductRef.current = selectedProduct
-  selectedPaymentMethodRef.current = selectedPaymentMethod
 
   const resolver = useCallback<Resolver<CheckoutFormData>>(
     async (values, context, options) => {
       const schema = createCheckoutSchema(
         selectedProductRef.current,
-        selectedPaymentMethodRef.current,
       )
       const dynamicResolver = zodResolver(schema) as Resolver<CheckoutFormData>
 
@@ -91,6 +87,7 @@ export function CheckoutPage() {
 
   const {
     clearErrors,
+    getValues,
     register,
     handleSubmit,
     unregister,
@@ -124,7 +121,6 @@ export function CheckoutPage() {
   const paymentStatusQuery = usePaymentStatus(
     order?.paymentMethod === PAYMENT_METHODS.PIX && pixPayment ? order.id : undefined,
   )
-  usePagBankSdk(selectedPaymentMethod)
 
   useEffect(() => {
     if (selectedPaymentMethod === PAYMENT_METHODS.PIX) {
@@ -160,6 +156,7 @@ export function CheckoutPage() {
 
   const handlePaymentMethodChange = (method: CheckoutFormData['paymentMethod']) => {
     setSelectedPaymentMethod(method)
+    setPixPayment(null)
     setValue('paymentMethod', method, {
       shouldDirty: true,
       shouldTouch: true,
@@ -172,70 +169,145 @@ export function CheckoutPage() {
     }
   }
 
-  const onSubmit = async (data: CheckoutFormData) => {
+  const showFormErrors = (formErrors: FieldErrors<CheckoutFormData>) => {
+    const firstErrorMessage = getFirstFormErrorMessage(formErrors)
+
+    toast.error(
+      firstErrorMessage ??
+        (selectedPaymentMethod === PAYMENT_METHODS.PIX
+          ? 'Preencha os campos obrigatorios para gerar o Pix.'
+          : 'Preencha os campos obrigatorios para concluir o pagamento.'),
+    )
+  }
+
+  const validateCheckoutForm = async () => {
+    let validatedData: CheckoutFormData | null = null
+
+    await handleSubmit(
+      async (data) => {
+        validatedData = data
+      },
+      (formErrors) => {
+        showFormErrors(formErrors)
+      },
+    )()
+
+    return validatedData
+  }
+
+  const completeCheckoutOrder = async (data: CheckoutFormData) => {
     if (!selectedProduct) {
       toast.error('Escolha uma edicao antes de continuar.')
+      return null
+    }
+
+    const normalizedData: CheckoutFormData = {
+      ...data,
+      paymentMethod: selectedPaymentMethod,
+    }
+
+    setCheckoutData(normalizedData)
+    setPaymentMethod(selectedPaymentMethod)
+
+    const createdOrder = await checkoutService.createOrder(normalizedData, selectedProduct)
+    setOrder(createdOrder)
+    setPaymentStatus(createdOrder.paymentStatus)
+
+    return createdOrder
+  }
+
+  const handlePixSubmit = async () => {
+    const data = await validateCheckoutForm()
+
+    if (!data) {
       return
     }
 
     try {
       setIsSubmitting(true)
-      const normalizedData: CheckoutFormData = {
-        ...data,
-        paymentMethod: selectedPaymentMethod,
-      }
+      const createdOrder = await completeCheckoutOrder(data)
 
-      setCheckoutData(normalizedData)
-      setPaymentMethod(selectedPaymentMethod)
-
-      const createdOrder = await checkoutService.createOrder(normalizedData, selectedProduct)
-      setOrder(createdOrder)
-      setPaymentStatus(createdOrder.paymentStatus)
-
-      if (selectedPaymentMethod === PAYMENT_METHODS.PIX) {
-        const pix = await paymentService.createPixPayment(createdOrder.id)
-        setPixPayment(pix)
-        setPaymentStatus(pix.status)
-        toast.success('Pix gerado com sucesso.')
+      if (!createdOrder) {
         return
       }
 
-      const holderName = data.card?.holderName ?? ''
-      const holderCpf = data.card?.holderCpf ?? ''
-      const installments = data.card?.installments ?? 1
-      const pagBankPublicKey = process.env.NEXT_PUBLIC_PAGBANK_PUBLIC_KEY?.trim()
-
-      if (!pagBankPublicKey) {
-        throw new Error('NEXT_PUBLIC_PAGBANK_PUBLIC_KEY nao foi configurada para o checkout transparente.')
-      }
-
-      const encryptedCard = await encryptCardWithPagBank({
-        publicKey: pagBankPublicKey,
-        holderName,
-        cardNumber: data.card?.cardNumber ?? '',
-        expiry: data.card?.expiry ?? '',
-        securityCode: data.card?.cvv ?? '',
-      })
-
-      const cardResponse = await paymentService.payWithCard({
-        orderId: createdOrder.id,
-        encryptedCard,
-        installments,
-        holderName,
-        holderCpf,
-      })
-
-      setPaymentStatus(cardResponse.status)
-
-      if (cardResponse.status === PAYMENT_STATUSES.PAID) {
-        router.push(`${ROUTES.paymentSuccess}?orderId=${createdOrder.id}`)
-        return
-      }
-
-      router.push(`${ROUTES.paymentFailure}?orderId=${createdOrder.id}`)
+      const pix = await paymentService.createPixPayment(createdOrder.id)
+      setPixPayment(pix)
+      setPaymentStatus(pix.status)
+      toast.success('Pix gerado com sucesso.')
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Nao foi possivel concluir o checkout.'
+      toast.error(message)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleMercadoPagoValidation = async () => {
+    if (selectedPaymentMethod !== PAYMENT_METHODS.CREDIT_CARD) {
+      return false
+    }
+
+    const data = await validateCheckoutForm()
+
+    if (!data) {
+      return false
+    }
+
+    return true
+  }
+
+  const handleMercadoPagoSubmit = async ({
+    token,
+    paymentMethodId,
+    issuerId,
+    installments,
+  }: {
+    token: string
+    paymentMethodId: string
+    issuerId?: string
+    installments: number
+  }) => {
+    if (selectedPaymentMethod !== PAYMENT_METHODS.CREDIT_CARD) {
+      return
+    }
+
+    const data = getValues()
+
+    try {
+      setIsSubmitting(true)
+      const createdOrder = await completeCheckoutOrder(data)
+
+      if (!createdOrder) {
+        return
+      }
+
+      const cardPayment = await paymentService.payWithCard({
+        orderId: createdOrder.id,
+        token,
+        paymentMethodId,
+        issuerId,
+        installments,
+      })
+
+      setPaymentStatus(cardPayment.status)
+
+      if (
+        cardPayment.status === PAYMENT_STATUSES.FAILED ||
+        cardPayment.status === PAYMENT_STATUSES.CANCELLED ||
+        cardPayment.status === PAYMENT_STATUSES.EXPIRED
+      ) {
+        router.push(`${ROUTES.paymentFailure}?orderId=${createdOrder.id}`)
+        return
+      }
+
+      router.push(
+        `${ROUTES.paymentSuccess}?orderId=${createdOrder.id}&status=${cardPayment.status}`,
+      )
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Nao foi possivel concluir o pagamento com cartao.'
       toast.error(message)
     } finally {
       setIsSubmitting(false)
@@ -246,7 +318,7 @@ export function CheckoutPage() {
     <>
       <Seo
         title="Checkout | A Ninfa de Prata"
-        description="Finalize a compra do livro com Pix ou cartao via backend seguro."
+        description="Finalize a compra do livro com Pix ou cartao via Mercado Pago."
       />
 
       <section className="space-y-8">
@@ -321,17 +393,8 @@ export function CheckoutPage() {
               </div>
             ) : (
               <form
+                id="checkout-form"
                 className="space-y-6"
-                onSubmit={handleSubmit(onSubmit, (formErrors) => {
-                  const firstErrorMessage = getFirstFormErrorMessage(formErrors)
-
-                  toast.error(
-                      firstErrorMessage ??
-                      (selectedPaymentMethod === PAYMENT_METHODS.PIX
-                        ? 'Preencha os campos obrigatorios para gerar o Pix.'
-                        : 'Preencha os campos obrigatorios para concluir o pagamento.'),
-                  )
-                })}
               >
                 <input type="hidden" {...register('paymentMethod')} />
 
@@ -368,25 +431,39 @@ export function CheckoutPage() {
                   </div>
 
                   {selectedPaymentMethod === PAYMENT_METHODS.CREDIT_CARD ? (
-                    <CreditCardFields
-                      errors={errors}
-                      register={register}
-                      setValue={setValue}
+                    <MercadoPagoCardFields
+                      amount={selectedProduct.price}
+                      disabled={isSubmitting}
+                      onReadyStateChange={setIsMercadoPagoReady}
+                      onSubmit={handleMercadoPagoSubmit}
+                      onValidateBeforeSubmit={handleMercadoPagoValidation}
                     />
                   ) : null}
 
                   <Button
                     className="mt-6 rounded-xl cursor-pointer bg-linear-to-r from-silver-300 to-silver-200 px-8 py-4 font-bold text-forest-900 shadow-[0_0_20px_rgba(237,177,255,0.18)] hover:brightness-105"
-                    disabled={isSubmitting}
+                    disabled={
+                      isSubmitting ||
+                      (selectedPaymentMethod === PAYMENT_METHODS.CREDIT_CARD && !isMercadoPagoReady)
+                    }
                     fullWidth
-                    type="submit"
+                    onClick={
+                      selectedPaymentMethod === PAYMENT_METHODS.PIX
+                        ? () => {
+                            void handlePixSubmit()
+                          }
+                        : undefined
+                    }
+                    type={selectedPaymentMethod === PAYMENT_METHODS.PIX ? 'button' : 'submit'}
                     variant="ghost"
                   >
                     {isSubmitting
                       ? 'Processando...'
                       : selectedPaymentMethod === PAYMENT_METHODS.PIX
                         ? 'Gerar Pix'
-                        : 'Pagar com cartao'}
+                        : isMercadoPagoReady
+                          ? 'Pagar com cartao'
+                          : 'Preparando formulario...'}
                   </Button>
                 </div>
 

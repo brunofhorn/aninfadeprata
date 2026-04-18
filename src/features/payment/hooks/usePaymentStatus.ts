@@ -1,11 +1,17 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
 import { paymentService } from '@/features/payment/services/payment.service'
+import type { PaymentStatusResponse } from '@/features/payment/types/payment.types'
 
-export function usePaymentStatus(orderId?: string) {
+type PaymentStatusQueryOptions = Pick<
+  UseQueryOptions<PaymentStatusResponse, Error>,
+  'enabled' | 'refetchInterval'
+>
+
+export function usePaymentStatus(orderId?: string, options?: PaymentStatusQueryOptions) {
   return useQuery({
     queryKey: ['payment-status', orderId],
     queryFn: () => paymentService.getPaymentStatus(orderId!),
-    enabled: Boolean(orderId),
-    refetchInterval: false,
+    enabled: options?.enabled ?? Boolean(orderId),
+    refetchInterval: options?.refetchInterval ?? false,
   })
 }

@@ -42,9 +42,9 @@ export function PaymentMethodSelector({
         onClick={() => onChange(PAYMENT_METHODS.CREDIT_CARD)}
       >
         <FiCreditCard className="text-xl text-silver-300" />
-        <p className="mt-3 text-lg font-semibold text-white">Cartao via PagBank</p>
+        <p className="mt-3 text-lg font-semibold text-white">Cartao via Mercado Pago</p>
         <p className="mt-1 text-sm text-white/60">
-          O frontend deve tokenizar os dados e enviar apenas o token para o backend.
+          Os dados sensiveis do cartao sao tokenizados pelo Mercado Pago e o pagamento acontece sem sair do checkout.
         </p>
       </button>
     </div>

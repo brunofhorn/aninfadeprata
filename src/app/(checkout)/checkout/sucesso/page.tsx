@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ orderId?: string }>
+  searchParams: Promise<{ orderId?: string; status?: string }>
 }) {
   const params = await searchParams
-  return <PaymentSuccessPage orderId={params.orderId} />
+  return <PaymentSuccessPage orderId={params.orderId} status={params.status} />
 }

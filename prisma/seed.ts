@@ -3,6 +3,7 @@ import 'dotenv/config'
 import { scryptSync } from 'node:crypto'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '../src/generated/prisma/client'
+import { PaymentProvider } from '../src/generated/prisma/enums'
 import { bookMock } from '../src/mocks/book'
 
 function getRequiredEnv(name: string) {
@@ -499,7 +500,7 @@ async function main() {
       },
       update: {
         orderId: fakeOrder.id,
-        provider: 'PAGBANK',
+        provider: PaymentProvider.MERCADO_PAGO,
         method: 'PIX',
         status: 'PAID',
         amount: paidVariant.price,
@@ -514,7 +515,7 @@ async function main() {
       create: {
         id: 'seed-payment-001',
         orderId: fakeOrder.id,
-        provider: 'PAGBANK',
+        provider: PaymentProvider.MERCADO_PAGO,
         method: 'PIX',
         status: 'PAID',
         amount: paidVariant.price,
